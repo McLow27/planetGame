@@ -10,9 +10,11 @@ public class Engine extends Canvas implements Runnable {
     public static final int WIDTH = 640, HEIGHT = WIDTH / 12 * 9;
     private Thread thread;
     private boolean running = false;
+    private Handler handler;
 
     public Engine() {
         new Window(WIDTH, HEIGHT, "Working Title", this);
+        handler = new Handler();
     }
 
     public synchronized void start() {
@@ -58,7 +60,7 @@ public class Engine extends Canvas implements Runnable {
     }
 
     private void tick() {
-
+        handler.tick();
     }
 
     public void render() {
@@ -72,6 +74,8 @@ public class Engine extends Canvas implements Runnable {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
+        handler.render(g);
+        
         g.dispose();
         bs.show();
     }
