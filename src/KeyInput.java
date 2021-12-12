@@ -3,27 +3,35 @@ package src;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+/**
+ * A key adapter for receiving and handling keyboard input, this will execute
+ * the corresponding methods of the engine's current GUI object
+ */
 public class KeyInput extends KeyAdapter {
 
-    Handler handler;
+    private Engine.UI handler;
 
-    public KeyInput(Handler handler) {
+    /**
+     * A new key adapter that can be added to the frame; in the event of a keyboard
+     * input, this will call the corresponding methods of the UI's current
+     * GUI object
+     */
+    public KeyInput(Engine.UI handler) {
         this.handler = handler;
     }
 
     public void keyPressed(KeyEvent e) {
-        int key = e.getKeyCode();
-        // Do something with the input
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE)
+            System.exit(0);
+        handler.getUI().keyPressed(e);
     }
 
     public void keyReleased(KeyEvent e) {
-        int key = e.getKeyCode();
-        // Do something with the input
+        handler.getUI().keyReleased(e);
     }
 
     public void keyTyped(KeyEvent e) {
-        int key = e.getKeyCode();
-        // Do something with the input
+        handler.getUI().keyTyped(e);
     }
 
 }

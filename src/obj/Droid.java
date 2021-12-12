@@ -1,4 +1,4 @@
-package src.tech;
+package src.obj;
 
 public class Droid {
     public Droid() {

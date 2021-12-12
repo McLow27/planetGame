@@ -1,11 +1,11 @@
-package src;
+package src.gui;
 
 import java.awt.Graphics;
 
-import src.tech.Type;
+import src.obj.Type;
 
 public abstract class Entity {
-    
+
     protected int x, y;
     protected Type type;
 
