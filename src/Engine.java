@@ -15,6 +15,8 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         new Window(WIDTH, HEIGHT, "Working Title", this);
         handler = new Handler();
+        this.addKeyListener(new KeyInput(handler));
+        this.addMouseListener(new MouseInput(handler));
     }
 
     public synchronized void start() {
@@ -75,7 +77,7 @@ public class Engine extends Canvas implements Runnable {
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
         handler.render(g);
-        
+
         g.dispose();
         bs.show();
     }
