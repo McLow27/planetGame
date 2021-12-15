@@ -26,7 +26,7 @@ public class Engine extends Canvas implements Runnable {
         /**
          * The current game state i.e. what is being displayed to the user
          */
-        enum State {
+        static enum State {
             TITLE,
             LOBBY,
             NONE,
