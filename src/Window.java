@@ -9,6 +9,8 @@ import java.awt.Dimension;
 
 public class Window extends Canvas {
 
+    public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
+
     public Window(int width, int height, String title, Engine engine) {
         JFrame frame = new JFrame(title);
         frame.setPreferredSize(new Dimension(width, height));
