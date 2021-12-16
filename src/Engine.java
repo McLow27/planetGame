@@ -15,6 +15,7 @@ import src.gui.Title;
 public class Engine extends Canvas implements Runnable {
 
     public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
+    public static final String TITLE = "Working Title";
     private Thread thread;
     private boolean running = false;
 
@@ -22,7 +23,7 @@ public class Engine extends Canvas implements Runnable {
      * This class is merely used for the InputAdapters to send input to the
      * currently displayed GUI since Java does not have pointers (kinda).
      */
-    class UI {
+    static class UI {
         /**
          * The current game state i.e. what is being displayed to the user
          */
@@ -92,7 +93,7 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         state = new UI();
         setState(UI.State.TITLE);
-        new Window(WIDTH, HEIGHT, "Working Title", this);
+        new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
         this.addMouseListener(new MouseInput(state));
     }
