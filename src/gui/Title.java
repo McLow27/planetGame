@@ -20,22 +20,24 @@ public class Title extends GUI {
     static class Satellite {
         private static final Random random = new Random();
         private double x, y, r;
-        private double velX, velR;
+        private double velX;
         private Dimension dimension;
         private int sat;
 
         public Satellite() {
-            this.velX = (random.nextInt(5) + 1) / 4.0;
-            this.velR = random.nextInt(7) - 3;
+            this.velX = (random.nextInt(50) + 10) / 40.0;
             this.sat = random.nextInt(sats.length);
-            final int w = sats[this.sat].getWidth(), h = sats[this.sat].getHeight();
-            final int maxS = 120, minS = 60;
+            final int width = sats[this.sat].getWidth(), height = sats[this.sat].getHeight();
+            final int max = 140, min = 30;
+
             double s;
             do
-                s = random.nextDouble();
-            while (s * w < maxS && s * w > minS);
-            this.dimension = new Dimension((int) (w * s), (int) (h * s));
-            this.x = -sats[this.sat].getWidth();
+                s = random.nextInt(1000) / 750.0;
+            while (!(s * width < max && s * width > min));
+
+            // double s = random.nextDouble() * (max - min) / width + min / width;
+            this.dimension = new Dimension((int) (width * s), (int) (height * s));
+            this.x = -this.dimension.getWidth();
             this.y = random.nextInt(Window.HEIGHT);
             this.r = random.nextInt(360);
         }
@@ -60,20 +62,12 @@ public class Title extends GUI {
             return velX;
         }
 
-        public double getRVelocity() {
-            return velR;
-        }
-
         public Dimension getDimension() {
             return dimension;
         }
 
         public void setX(double x) {
             this.x = x;
-        }
-
-        public void setRotation(double r) {
-            this.r = r;
         }
     }
 
@@ -89,7 +83,7 @@ public class Title extends GUI {
                 sats[i] = ImageIO.read(new File(path + "\\rsc\\satellites\\satellite" + i + ".png"));
             }
             satellites = new LinkedList<Satellite>();
-            int r = random.nextInt(12) + 12;
+            int r = random.nextInt(8) + 6;
             for (int i = 0; i < r; i++) {
                 Satellite sat = new Satellite();
                 sat.setX(random.nextInt(Window.WIDTH));
@@ -125,6 +119,7 @@ public class Title extends GUI {
         }
         g.drawImage(wallpaper, (Window.WIDTH - w) / 2, (Window.HEIGHT - h) / 2, w, h, null);
 
+        // TODO find out how to rotate the satellite
         for (Satellite sat : satellites) {
             g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
                     (int) sat.getY(),
@@ -134,13 +129,12 @@ public class Title extends GUI {
     }
 
     public void tick() {
-        if (random.nextInt(120) < 1)
+        if (random.nextInt(200) < 1)
             satellites.add(new Satellite());
 
         for (int i = 0; i < satellites.size(); i++) {
             Satellite sat = satellites.get(i);
             sat.setX(sat.getX() + sat.getXVelocity());
-            // sat.setRotation(sat.getRotation() + sat.getRVelocity());
             if (sat.getX() > Window.WIDTH)
                 satellites.remove(i);
         }
