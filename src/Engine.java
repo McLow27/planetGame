@@ -35,7 +35,7 @@ public class Engine extends Canvas implements Runnable {
         }
 
         private GUI ui;
-        private State state;
+        private static State state;
 
         /**
          * An empty constructor creating a new UI object with the game state being NONE
@@ -43,7 +43,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public UI() {
             this.ui = null;
-            this.state = State.NONE;
+            UI.state = State.NONE;
         }
 
         /**
@@ -51,7 +51,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public UI(GUI gui, State state) {
             this.ui = gui;
-            this.state = state;
+            UI.state = state;
         }
 
         /**
@@ -63,7 +63,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public void setState(GUI gui, State state) {
             this.ui = gui;
-            this.state = state;
+            UI.state = state;
         }
 
         /**
