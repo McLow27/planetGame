@@ -2,6 +2,8 @@ package src.gui;
 
 import java.io.File;
 import javax.imageio.ImageIO;
+
+
 import java.util.LinkedList;
 import java.util.Random;
 import java.awt.Dimension;
@@ -141,7 +143,21 @@ public class Title extends GUI {
         }
 
         // Title
-        g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
+        g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 0, null);
+
+        g.setColor(new Color(202,204,255,20));
+        g.fillRect(500, 350, 150, 40);
+
+        g.setColor(Color.white);
+        g.setFont(new Font("TimesRoman", Font.ROMAN_BASELINE, 20)); 
+        g.drawString("Join Lobby", 533, 375);
+        
+        g.setColor(new Color(202,204,255,20));
+        g.fillRect(600, 420, 150, 40);
+        g.setColor(Color.white);
+        g.setFont(new Font("TimesRoman", Font.ROMAN_BASELINE, 20)); 
+        g.drawString("Open Lobby", 630, 445);
+
     }
 
     public void tick() {
