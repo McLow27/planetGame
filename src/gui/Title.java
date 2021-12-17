@@ -2,10 +2,9 @@ package src.gui;
 
 import java.io.File;
 import javax.imageio.ImageIO;
-
-
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -14,6 +13,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
+import java.awt.Image;
+import java.util.Comparator;
 import src.Window;
 import src.GUI;
 
@@ -75,10 +76,33 @@ public class Title extends GUI {
         }
     }
 
+    static record Button(String title, Dimension bounds, Image icon) {
+        public Button(String title, Dimension bounds) {
+            this(title, bounds, null);
+        }
+
+        public int getWidth() {
+            return bounds.width;
+        }
+
+        public int getHeight() {
+            return bounds.height;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public Image getIcon() {
+            return icon;
+        }
+    }
+
     BufferedImage wallpaper;
     LinkedList<Satellite> satellites;
     LinkedList<Rectangle> flares;
     BufferedImage header;
+    LinkedList<Button> buttons;
 
     public Title() {
         try {
@@ -102,16 +126,24 @@ public class Title extends GUI {
                     "Righteous" }[5];
             font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\" + fontfile + ".ttf")).deriveFont(92f);
             FontMetrics fm = new Canvas().getFontMetrics(font);
-            final int offset = 6;
+            final int offset = 4;
             header = new BufferedImage(fm.stringWidth(Window.TITLE) + offset, fm.getHeight() + fm.getDescent() + offset,
                     BufferedImage.TYPE_INT_ARGB);
             Graphics g = header.getGraphics();
             final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
             g.setFont(font);
-            g.setColor(front);
-            g.drawString(Window.TITLE, 0, header.getHeight() - fm.getDescent());
             g.setColor(back);
-            g.drawString(Window.TITLE, offset, header.getHeight() - fm.getDescent() - offset);
+            g.drawString(Window.TITLE, offset, header.getHeight() - fm.getDescent());
+            g.setColor(front);
+            g.drawString(Window.TITLE, 0, header.getHeight() - fm.getDescent() + offset);
+            // Buttons
+            buttons = new LinkedList<Button>();
+            buttons.add(new Button("Join Lobby", new Dimension(4 * 60, 60)));
+            buttons.add(new Button("Open Lobby", new Dimension(4 * 60, 60)));
+            BufferedImage cog = ImageIO.read(new File(path + "\\rsc\\icons\\cog.png")),
+                    globe = ImageIO.read(new File(path + "\\rsc\\icons\\globe.png"));
+            buttons.add(new Button("Settings", new Dimension(60, 60), cog));
+            buttons.add(new Button("Credits", new Dimension(60, 60), globe));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -143,22 +175,10 @@ public class Title extends GUI {
         }
 
         // Title
-        g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 0, null);
+        g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
 
-        //Join and Open Lobby buttons
-        g.setColor(new Color(202,204,255,20));
-        g.fillRect(500, 350, 150, 40);
-
-        g.setColor(Color.white);
-        g.setFont(new Font("TimesRoman", Font.ROMAN_BASELINE, 20)); 
-        g.drawString("Join Lobby", 533, 375);
-        
-        g.setColor(new Color(202,204,255,20));
-        g.fillRect(600, 420, 150, 40);
-        g.setColor(Color.white);
-        g.setFont(new Font("TimesRoman", Font.ROMAN_BASELINE, 20)); 
-        g.drawString("Open Lobby", 630, 445);
-
+        // UI Buttons
+        Button btn;
     }
 
     public void tick() {
