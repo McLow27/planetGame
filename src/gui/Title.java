@@ -9,13 +9,18 @@ import java.util.Comparator;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Polygon;
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Paint;
+import java.awt.GradientPaint;
+import java.awt.AlphaComposite;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.awt.Color;
 import src.Window;
 import src.GUI;
 
@@ -77,17 +82,11 @@ public class Title extends GUI {
         }
     }
 
-    static record Button(String title, Dimension bounds, Image icon) {
-        public Button(String title, Dimension bounds) {
-            this(title, bounds, null);
-        }
+    static record Button(String title, Image icon) {
+        public static final int square = 60, space = square/5, rectangle = 4 * square, total = square + space + rectangle;
 
-        public int getWidth() {
-            return bounds.width;
-        }
-
-        public int getHeight() {
-            return bounds.height;
+        public Button(String title) {
+            this(title, null);
         }
 
         public String getTitle() {
@@ -96,6 +95,27 @@ public class Title extends GUI {
 
         public Image getIcon() {
             return icon;
+        }
+
+        public BufferedImage renderButton(Dimension size, Paint color) {
+            BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D) img.getGraphics();
+            g.setPaint(color);
+            g.fillRect(0, 0, size.width, size.height);
+            final int carve = Button.square / 12;
+            g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+            int cs[][] = {{0, carve}, {0, carve*2}, {carve*5, carve*2}, {carve*7, 0}, {carve*6, 0}, {carve*5, carve}}, xs[] = new int[cs.length], ys[] = new int[cs.length];
+            for (int i = 0; i < cs.length; i++){
+                xs[i] = cs[i][0];
+                ys[i] = cs[i][1];
+            }
+            g.fillPolygon(new Polygon(xs, ys, cs.length));
+            for (int i = 0; i < cs.length; i++) {
+                xs[i] = size.width - xs[i];
+                ys[i] = size.height - ys[i];
+            }
+            g.fillPolygon(new Polygon(xs, ys, cs.length));
+            return img;
         }
     }
 
@@ -138,15 +158,14 @@ public class Title extends GUI {
             g.setColor(front);
             g.drawString(Window.TITLE, 0, header.getHeight() - fm.getDescent() + offset);
             // Buttons
-            final int space = 10;
             buttons = new LinkedList<Button>();
-            buttons.add(new Button("Join Lobby", new Dimension(4 * 60, 60)));
-            buttons.add(new Button("Open Lobby", new Dimension(4 * 60, 60)));
+            buttons.add(new Button("Join Lobby"));
+            buttons.add(new Button("Open Lobby"));
             BufferedImage cog = ImageIO.read(new File(path + "\\rsc\\icons\\cog.png")),
                     globe = ImageIO.read(new File(path + "\\rsc\\icons\\globe.png"));
-            buttons.add(new Button("Settings", new Dimension(60, 60), cog));
-            buttons.add(new Button("Credits", new Dimension(60, 60), globe));
-            buttons.add(new Button(Window.TITLE + " in a nutshell", new Dimension(5*60+10, 60)));
+            buttons.add(new Button("Settings", cog));
+            buttons.add(new Button("Credits", globe));
+            buttons.add(new Button(Window.TITLE + " in a nutshell"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -181,10 +200,32 @@ public class Title extends GUI {
         g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
 
         // UI Buttons
-        final int space = 10;
+        int startx = (Window.WIDTH - Button.total)/2;
+        int starty = (Window.HEIGHT - ((int)(buttons.size()/2)*Button.square + ((int)(buttons.size()/2)-1)*Button.space))/2;
+        int nexty = starty;
+        final Color color1 = new Color(238, 0, 253), color2 = new Color(168, 0, 244);
         Button btn;
-        for (int i = 0; i < buttons.size(); i++ ) {
-
+        for (int i = 0; i < buttons.size(); i++) {
+            btn = buttons.get(i);
+            Dimension dim;
+            GradientPaint paint;
+            if (i % 2 == 0 && i + 1 == buttons.size()) {
+                dim = new Dimension(Button.total, Button.square);
+                paint = new GradientPaint(0, dim.height/2, color1,dim.width,dim.height/2,color2,true);
+                g.drawImage(btn.renderButton(dim, paint), startx, nexty, null);
+                nexty += Button.square + Button.space;
+            }
+            else if(i % 2 == 0) {
+                dim = new Dimension(i % 4 == 2 ? Button.square:Button.rectangle, Button.square);
+                paint = new GradientPaint(0, dim.height/2, color1,dim.width,dim.height/2,color2,true);
+                g.drawImage(btn.renderButton(dim, paint), startx, nexty, null);
+            }
+            else if (i%2==1) {
+                dim = new Dimension(i % 4 == 1 ? Button.square:Button.rectangle, Button.square);
+                paint = new GradientPaint(0, dim.height/2, color1,dim.width,dim.height/2,color2,true);
+                g.drawImage(btn.renderButton(dim, paint), startx + Button.space + (i%4==1?Button.rectangle:Button.square), nexty, null);
+                nexty += Button.square + Button.space;
+            }
         }
     }
 
