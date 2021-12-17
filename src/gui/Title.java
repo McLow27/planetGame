@@ -145,6 +145,7 @@ public class Title extends GUI {
         // Title
         g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 0, null);
 
+        //Join and Open Lobby buttons
         g.setColor(new Color(202,204,255,20));
         g.fillRect(500, 350, 150, 40);
 
