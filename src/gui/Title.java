@@ -3,18 +3,19 @@ package src.gui;
 import java.io.File;
 import javax.imageio.ImageIO;
 import java.util.LinkedList;
-import java.util.Random;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Comparator;
 import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Canvas;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.FontMetrics;
+import java.awt.Font;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.Color;
-import java.awt.Image;
-import java.util.Comparator;
 import src.Window;
 import src.GUI;
 
@@ -137,6 +138,7 @@ public class Title extends GUI {
             g.setColor(front);
             g.drawString(Window.TITLE, 0, header.getHeight() - fm.getDescent() + offset);
             // Buttons
+            final int space = 10;
             buttons = new LinkedList<Button>();
             buttons.add(new Button("Join Lobby", new Dimension(4 * 60, 60)));
             buttons.add(new Button("Open Lobby", new Dimension(4 * 60, 60)));
@@ -144,6 +146,7 @@ public class Title extends GUI {
                     globe = ImageIO.read(new File(path + "\\rsc\\icons\\globe.png"));
             buttons.add(new Button("Settings", new Dimension(60, 60), cog));
             buttons.add(new Button("Credits", new Dimension(60, 60), globe));
+            buttons.add(new Button(Window.TITLE + " in a nutshell", new Dimension(5*60+10, 60)));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,7 +181,11 @@ public class Title extends GUI {
         g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
 
         // UI Buttons
+        final int space = 10;
         Button btn;
+        for (int i = 0; i < buttons.size(); i++ ) {
+
+        }
     }
 
     public void tick() {
