@@ -298,7 +298,7 @@ public class Title extends GUI {
     }
 
     public void tick() {
-        if (random.nextInt(200) < 1)
+        if (random.nextInt(60) < 1)
             satellites.add(new Satellite());
         for (int i = 0; i < satellites.size(); i++) {
             Satellite sat = satellites.get(i);
