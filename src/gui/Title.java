@@ -9,7 +9,6 @@ import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Polygon;
-import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -25,6 +24,7 @@ import java.awt.event.MouseEvent;
 import src.Window;
 import src.Engine;
 import src.GUI;
+import src.obj.Header;
 
 public class Title extends GUI {
 
@@ -37,9 +37,9 @@ public class Title extends GUI {
      */
     private HashMap<String, Rectangle> actionfields;
     /**
-     * hfont = the font of the header; font = the font of everything else
+     * The standard Kurzgesagt font for everything
      */
-    private static Font hfont, font;
+    private static Font font;
     /**
      * The images of all asteroids and artifical satellites flying by in the background
      */
@@ -172,7 +172,7 @@ public class Title extends GUI {
     /**
      * The header image
      */
-    BufferedImage header;
+    Header header;
     /**
      * Random transparent rectangles that add a futuristic effect to the header's fade-in animation
      */
@@ -196,18 +196,8 @@ public class Title extends GUI {
                 satellites.add(sat);
             }
             // Title and animation
-            hfont = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f);
-            FontMetrics fm = new Canvas().getFontMetrics(hfont);
-            final int offset = 4;
-            header = new BufferedImage(fm.stringWidth(Window.TITLE) + offset, fm.getHeight() + fm.getDescent() + offset,
-                    BufferedImage.TYPE_INT_ARGB);
-            Graphics g = header.getGraphics();
             final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
-            g.setFont(hfont);
-            g.setColor(back);
-            g.drawString(Window.TITLE, offset, header.getHeight() - fm.getDescent());
-            g.setColor(front);
-            g.drawString(Window.TITLE, 0, header.getHeight() - fm.getDescent() + offset);
+            header = new Header(Window.TITLE, Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f), front, back);
             // Buttons
             font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\NexaHeavy.ttf"));
             buttons = new LinkedList<Button>();
@@ -274,7 +264,8 @@ public class Title extends GUI {
         }
 
         // Title
-        g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
+        final BufferedImage titlerender = header.render();
+        g.drawImage(titlerender, (Window.WIDTH - titlerender.getWidth()) / 2, 40, null);
 
         // UI Buttons
         Graphics2D g2d = (Graphics2D) g;
