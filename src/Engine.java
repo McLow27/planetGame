@@ -128,8 +128,8 @@ public class Engine extends Canvas implements Runnable {
      */
     public void run() {
         long lastTime = System.nanoTime();
-        double tps = 20.0;
-        double ns = 100000000 / tps;
+        double tps = 60.0;
+        double ns = 1000000000 / tps;
         double delta = 0;
         long timer = System.currentTimeMillis();
         int frames = 0;

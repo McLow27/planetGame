@@ -2,7 +2,6 @@ package src.gui;
 
 import java.io.File;
 import javax.imageio.ImageIO;
-import javax.swing.SwingUtilities;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Random;
@@ -23,7 +22,6 @@ import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.event.MouseEvent;
-import java.awt.MouseInfo;
 import src.Window;
 import src.Engine;
 import src.GUI;
@@ -59,7 +57,7 @@ public class Title extends GUI {
         private int sat;
 
         public Satellite() {
-            this.velX = (random.nextInt(50) + 10) / 40.0;
+            this.velX = (random.nextInt(50) + 10) / 12.0;
             this.sat = random.nextInt(sats.length);
             final int width = sats[this.sat].getWidth(), height = sats[this.sat].getHeight();
             final int max = 140, min = 30;
@@ -279,20 +277,29 @@ public class Title extends GUI {
         g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
 
         // UI Buttons
+        Graphics2D g2d = (Graphics2D) g;
+        final Composite neutral = g2d.getComposite();
         final Color color1 = new Color(238, 0, 253), color2 = new Color(168, 0, 244);
         for (int i = 0; i < buttons.size(); i++) {
+            final double ticks = 30.0;
+            if (i * ticks / 2 > fadein)
+                continue;
+            double fade = 1.0;
+            if(fadein < (i + 2) * ticks / 2)
+                fade = smoothCurve((int) (fadein - i * ticks / 2), ticks, 100) / 100.0;
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fade));
             Rectangle field = actionfields.get(buttons.get(i).getTitle());
             GradientPaint paint = new GradientPaint(0, field.height / 2, color1, field.width, field.height / 2, color2,
                     true);
             g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x,
-                    field.y, null);
+                    field.y + (int)((1.0-fade) * Button.square / 2), null);
         }
+        g2d.setComposite(neutral);
     }
 
     public void tick() {
         if (random.nextInt(200) < 1)
             satellites.add(new Satellite());
-
         for (int i = 0; i < satellites.size(); i++) {
             Satellite sat = satellites.get(i);
             sat.setX(sat.getX() + sat.getXVelocity());
@@ -300,7 +307,8 @@ public class Title extends GUI {
                 satellites.remove(i);
         }
 
-        if (fadein < 20 * 5)
+        // Fade-in animation
+        if (fadein < 30 * (buttons.size()+1))
             fadein++;
 
         // Hover action
@@ -311,6 +319,7 @@ public class Title extends GUI {
                 continue;
             if (mouse.getY() < field.getY() || mouse.getY() > field.getY() + field.getHeight())
                 continue;
+            // TODO Do something
             System.out.println("Mouse is hovering over '" + title + "'!");
         }
     }
@@ -322,6 +331,7 @@ public class Title extends GUI {
                 continue;
             if (e.getY() < field.getY() || e.getY() > field.getY() + field.getHeight())
                 continue;
+            // TODO Add whatever happens now
             System.out.println("'" + title + "' has been clicked!");
         }
     }
