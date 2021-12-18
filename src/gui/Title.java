@@ -239,32 +239,13 @@ public class Title extends GUI {
         g.drawImage(header, (Window.WIDTH - header.getWidth()) / 2, 40, null);
 
         // UI Buttons
-        int startx = (Window.WIDTH - Button.total) / 2;
-        int starty = (Window.HEIGHT
-                - ((int) (buttons.size() / 2) * Button.square + ((int) (buttons.size() / 2) - 1) * Button.space)) / 2;
-        int nexty = starty;
         final Color color1 = new Color(238, 0, 253), color2 = new Color(168, 0, 244);
-        Button btn;
         for (int i = 0; i < buttons.size(); i++) {
-            btn = buttons.get(i);
-            Dimension dim;
-            GradientPaint paint;
-            if (i % 2 == 0 && i + 1 == buttons.size()) {
-                dim = new Dimension(Button.total, Button.square);
-                paint = new GradientPaint(0, dim.height / 2, color1, dim.width, dim.height / 2, color2, true);
-                g.drawImage(btn.renderButton(dim, paint), startx, nexty, null);
-                nexty += Button.square + Button.space;
-            } else if (i % 2 == 0) {
-                dim = new Dimension(i % 4 == 2 ? Button.square : Button.rectangle, Button.square);
-                paint = new GradientPaint(0, dim.height / 2, color1, dim.width, dim.height / 2, color2, true);
-                g.drawImage(btn.renderButton(dim, paint), startx, nexty, null);
-            } else if (i % 2 == 1) {
-                dim = new Dimension(i % 4 == 1 ? Button.square : Button.rectangle, Button.square);
-                paint = new GradientPaint(0, dim.height / 2, color1, dim.width, dim.height / 2, color2, true);
-                g.drawImage(btn.renderButton(dim, paint),
-                        startx + Button.space + (i % 4 == 1 ? Button.rectangle : Button.square), nexty, null);
-                nexty += Button.square + Button.space;
-            }
+            Rectangle field = actionfields.get(buttons.get(i).getTitle());
+            GradientPaint paint = new GradientPaint(0, field.height / 2, color1, field.width, field.height / 2, color2,
+                    true);
+            g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x,
+                    field.y, null);
         }
     }
 
@@ -281,7 +262,13 @@ public class Title extends GUI {
     }
 
     public void mousePressed(MouseEvent e) {
-        for (Button btn : buttons) {
+        for (String title : actionfields.keySet()) {
+            Rectangle field = actionfields.get(title);
+            if (e.getX() < field.getX() || e.getX() > field.getX() + field.getWidth())
+                continue;
+            if (e.getY() < field.getY() || e.getY() > field.getY() + field.getHeight())
+                continue;
+            System.out.println("'" + title + "' has been clicked!");
         }
     }
 }
