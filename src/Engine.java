@@ -1,9 +1,12 @@
 package src;
 
+import javax.swing.SwingUtilities;
+import java.awt.image.BufferStrategy;
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.image.BufferStrategy;
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.MouseInfo;
 import src.gui.Handler;
 import src.gui.Title;
 
@@ -16,6 +19,7 @@ public class Engine extends Canvas implements Runnable {
 
     public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
     public static final String TITLE = "Working Title";
+    private static Window frame;
     private Thread thread;
     private boolean running = false;
 
@@ -93,7 +97,7 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         state = new UI();
         setState(UI.State.TITLE);
-        new Window(WIDTH, HEIGHT, TITLE, this);
+        frame = new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
         this.addMouseListener(new MouseInput(state));
     }
@@ -181,6 +185,12 @@ public class Engine extends Canvas implements Runnable {
      */
     public UI.State getState() {
         return state.getState();
+    }
+
+    public static Point getMousePoint() {
+        Point mouse = MouseInfo.getPointerInfo().getLocation();
+        SwingUtilities.convertPointFromScreen(mouse, Engine.frame.getFrame());
+        return mouse;
     }
 
     /**

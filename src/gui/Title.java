@@ -2,9 +2,11 @@ package src.gui;
 
 import java.io.File;
 import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.util.Random;
+import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Polygon;
@@ -21,15 +23,32 @@ import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.event.MouseEvent;
+import java.awt.MouseInfo;
 import src.Window;
+import src.Engine;
 import src.GUI;
 
 public class Title extends GUI {
 
+    /**
+     * A random number generator for everything in this class
+     */
     private Random random = new Random();
+    /**
+     * A map containing all clickable objects on screen and their identifiers
+     */
     private HashMap<String, Rectangle> actionfields;
+    /**
+     * hfont = the font of the header; font = the font of everything else
+     */
     private static Font hfont, font;
+    /**
+     * The images of all asteroids and artifical satellites flying by in the background
+     */
     private static BufferedImage[] sats;
+    /**
+     * The path of this code, + "\\rsc" is the resource folder
+     */
     static final String path = System.getProperty("user.dir");
 
     static class Satellite {
@@ -136,11 +155,30 @@ public class Title extends GUI {
         }
     }
 
+    /**
+     * The wallpaper in the background
+     */
     BufferedImage wallpaper;
+    /**
+     * A linked list containing all the asteroids and artificial satellites in the background
+     */
     LinkedList<Satellite> satellites;
-    LinkedList<Rectangle> flares;
-    BufferedImage header;
+    /**
+     * The tick of the fade-in animation of the buttons
+     */
+    int fadein;
+    /**
+     * The UI buttons on the title screen
+     */
     LinkedList<Button> buttons;
+    /**
+     * The header image
+     */
+    BufferedImage header;
+    /**
+     * Random transparent rectangles that add a futuristic effect to the header's fade-in animation
+     */
+    LinkedList<Rectangle> flares;
 
     public Title() {
         try {
@@ -205,6 +243,8 @@ public class Title extends GUI {
                 }
                 actionfields.put(buttons.get(i).getTitle(), box);
             }
+            // Fade-in animations
+            fadein = 0;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -258,6 +298,20 @@ public class Title extends GUI {
             sat.setX(sat.getX() + sat.getXVelocity());
             if (sat.getX() > Window.WIDTH)
                 satellites.remove(i);
+        }
+
+        if (fadein < 20 * 5)
+            fadein++;
+
+        // Hover action
+        Point mouse = Engine.getMousePoint();
+        for (String title : actionfields.keySet()) {
+            Rectangle field = actionfields.get(title);
+            if (mouse.getX() < field.getX() || mouse.getX() > field.getX() + field.getWidth())
+                continue;
+            if (mouse.getY() < field.getY() || mouse.getY() > field.getY() + field.getHeight())
+                continue;
+            System.out.println("Mouse is hovering over '" + title + "'!");
         }
     }
 
