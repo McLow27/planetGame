@@ -1,9 +1,12 @@
 package src;
 
+import javax.swing.SwingUtilities;
+import java.awt.image.BufferStrategy;
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.image.BufferStrategy;
 import java.awt.Color;
+import java.awt.Point;
+import java.awt.MouseInfo;
 import src.gui.Handler;
 import src.gui.Title;
 
@@ -15,6 +18,8 @@ import src.gui.Title;
 public class Engine extends Canvas implements Runnable {
 
     public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
+    public static final String TITLE = "Working Title";
+    private static Window frame;
     private Thread thread;
     private boolean running = false;
 
@@ -22,11 +27,11 @@ public class Engine extends Canvas implements Runnable {
      * This class is merely used for the InputAdapters to send input to the
      * currently displayed GUI since Java does not have pointers (kinda).
      */
-    class UI {
+    static class UI {
         /**
          * The current game state i.e. what is being displayed to the user
          */
-        enum State {
+        static enum State {
             TITLE,
             LOBBY,
             NONE,
@@ -34,7 +39,7 @@ public class Engine extends Canvas implements Runnable {
         }
 
         private GUI ui;
-        private State state;
+        private static State state;
 
         /**
          * An empty constructor creating a new UI object with the game state being NONE
@@ -42,7 +47,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public UI() {
             this.ui = null;
-            this.state = State.NONE;
+            UI.state = State.NONE;
         }
 
         /**
@@ -50,7 +55,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public UI(GUI gui, State state) {
             this.ui = gui;
-            this.state = state;
+            UI.state = state;
         }
 
         /**
@@ -62,7 +67,7 @@ public class Engine extends Canvas implements Runnable {
          */
         public void setState(GUI gui, State state) {
             this.ui = gui;
-            this.state = state;
+            UI.state = state;
         }
 
         /**
@@ -92,7 +97,7 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         state = new UI();
         setState(UI.State.TITLE);
-        new Window(WIDTH, HEIGHT, "Working Title", this);
+        frame = new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
         this.addMouseListener(new MouseInput(state));
     }
@@ -123,8 +128,8 @@ public class Engine extends Canvas implements Runnable {
      */
     public void run() {
         long lastTime = System.nanoTime();
-        double tps = 20.0;
-        double ns = 100000000 / tps;
+        double tps = 60.0;
+        double ns = 1000000000 / tps;
         double delta = 0;
         long timer = System.currentTimeMillis();
         int frames = 0;
@@ -180,6 +185,12 @@ public class Engine extends Canvas implements Runnable {
      */
     public UI.State getState() {
         return state.getState();
+    }
+
+    public static Point getMousePoint() {
+        Point mouse = MouseInfo.getPointerInfo().getLocation();
+        SwingUtilities.convertPointFromScreen(mouse, Engine.frame.getFrame());
+        return mouse;
     }
 
     /**

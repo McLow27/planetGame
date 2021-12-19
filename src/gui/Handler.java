@@ -1,9 +1,8 @@
 package src.gui;
 
 import java.util.LinkedList;
-
-import src.GUI;
 import java.awt.Graphics;
+import src.GUI;
 
 public class Handler extends GUI {
     LinkedList<Entity> objects = new LinkedList<Entity>();
