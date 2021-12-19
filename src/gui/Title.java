@@ -299,6 +299,7 @@ public class Title extends GUI {
         }
 
         // Fade-in animation
+        header.tick();
         if (fadein < 30 * (buttons.size()+1))
             fadein++;
 
