@@ -1,11 +1,11 @@
 package src;
 
-import java.awt.Canvas;
-import java.awt.Image;
+import javax.swing.JFrame;
 import javax.imageio.ImageIO;
 import java.io.File;
-import javax.swing.JFrame;
+import java.awt.Image;
 import java.awt.Dimension;
+import java.awt.Canvas;
 
 public class Window extends Canvas {
 

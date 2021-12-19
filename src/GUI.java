@@ -122,4 +122,21 @@ public abstract class GUI {
     public void mouseWheelMoved(MouseWheelEvent e) {
     }
 
+    /**
+	 * Creates a smooth animation curve using the mathematical sine function
+	 *
+	 * f(x) = (sin((x / (dx / 3) + 4.75) + 1.0) * dy / 2
+	 *
+	 * @param x  the current tick or the x of the function
+	 * @param dx the x of the highpoint and the ending tick of the function (the
+	 *           speed)
+	 * @param dy the y of the highpoint and the final returned value (the
+	 *           width/height)
+	 * @return the current y of the function f(x)
+	 */
+	public static int smoothCurve(int x, double dx, double dy) {
+		double d = java.lang.Math.sin((x / (dx / 3)) + 4.75) + 1.0;
+		return (int) (d * dy / 2);
+	}
+
 }
