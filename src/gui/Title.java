@@ -27,7 +27,7 @@ import src.Engine;
 import src.GUI;
 import src.obj.Header;
 
-public class Title extends GUI {
+public class Title extends GUI implements Start {
 
     /**
      * A random number generator for everything in this class
@@ -42,64 +42,9 @@ public class Title extends GUI {
      */
     private static Font font;
     /**
-     * The images of all asteroids and artifical satellites flying by in the background
-     */
-    private static BufferedImage[] sats;
-    /**
      * The path of this code, + "\\rsc" is the resource folder
      */
     static final String path = System.getProperty("user.dir");
-
-    static class Satellite {
-        private static final Random random = new Random();
-        private double x, y, r;
-        private double velX;
-        private Dimension dimension;
-        private int sat;
-
-        public Satellite() {
-            this.velX = (random.nextInt(50) + 10) / 12.0;
-            this.sat = random.nextInt(sats.length);
-            final int width = sats[this.sat].getWidth(), height = sats[this.sat].getHeight();
-            final int max = 140, min = 30;
-            double s;
-            do
-                s = random.nextInt(1000) / 750.0;
-            while (!(s * width < max && s * width > min));
-            this.dimension = new Dimension((int) (width * s), (int) (height * s));
-            this.x = -this.dimension.getWidth();
-            this.y = random.nextInt(Window.HEIGHT);
-            this.r = random.nextInt(360);
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-
-        public int getSatellite() {
-            return sat;
-        }
-
-        public double getRotation() {
-            return r;
-        }
-
-        public double getXVelocity() {
-            return velX;
-        }
-
-        public Dimension getDimension() {
-            return dimension;
-        }
-
-        public void setX(double x) {
-            this.x = x;
-        }
-    }
 
     static record Button(String title, Image icon) {
 
@@ -155,47 +100,41 @@ public class Title extends GUI {
     }
 
     /**
-     * The wallpaper in the background
+     * The background object with random moving satellites
      */
-    BufferedImage wallpaper;
-    /**
-     * A linked list containing all the asteroids and artificial satellites in the background
-     */
-    LinkedList<Satellite> satellites;
+    private Background wallpaper;
     /**
      * The tick of the fade-in animation of the buttons
      */
-    int fadein;
+    private short fadein;
     /**
      * The UI buttons on the title screen
      */
-    LinkedList<Button> buttons;
+    private LinkedList<Button> buttons;
+    /**
+     * 
+     */
+    private short hoverflow[];
     /**
      * The header image
      */
-    Header header;
+    private Header header;
     /**
-     * Random transparent rectangles that add a futuristic effect to the header's fade-in animation
+     * The third color for the hover animation of the GUI buttons
      */
-    LinkedList<Rectangle> flares;
+    private Color color3;
 
     public Title() {
+        this(new Background());
+    }
+
+    public Title(Background wallpaper) {
         try {
             // Wallpaper
-            wallpaper = ImageIO.read(new File(path + "\\rsc\\title.png"));
-            // Background satellites
-            int len = new File(path + "\\rsc\\satellites\\").listFiles().length;
-            sats = new BufferedImage[len];
-            for (int i = 0; i < len; i++) {
-                sats[i] = ImageIO.read(new File(path + "\\rsc\\satellites\\satellite" + i + ".png"));
-            }
-            satellites = new LinkedList<Satellite>();
-            int r = random.nextInt(8) + 6;
-            for (int i = 0; i < r; i++) {
-                Satellite sat = new Satellite();
-                sat.setX(random.nextInt(Window.WIDTH));
-                satellites.add(sat);
-            }
+            this.wallpaper = wallpaper;
+            // Random third color
+            Color[] colors = new Color[] {new Color(11, 255, 131), new Color(255, 254, 6), new Color(25, 254, 255)};
+            color3 = colors[random.nextInt(colors.length)];
             // Title and animation
             final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
             header = new Header(Window.TITLE, Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f), front, back);
@@ -232,8 +171,9 @@ public class Title extends GUI {
                 }
                 actionfields.put(buttons.get(i).getTitle(), box);
             }
-            // Fade-in animations
-            fadein = 0;
+            // Button animations
+            this.fadein = 0;
+            this.hoverflow = new short[buttons.size()];
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -245,25 +185,8 @@ public class Title extends GUI {
 
     public void simRender(Graphics g, double d) {
         // Wallpaper
-        int w = wallpaper.getWidth(), h = wallpaper.getHeight();
-        if (w / Window.WIDTH < h / Window.HEIGHT) {
-            h = h * Window.WIDTH / w;
-            w = Window.WIDTH;
-        } else {
-            w = w * Window.HEIGHT / h;
-            h = Window.HEIGHT;
-        }
-        g.drawImage(wallpaper, (Window.WIDTH - w) / 2, (Window.HEIGHT - h) / 2, w, h, null);
-
-        // Satellites
-        // TODO find out how to rotate the satellite
-        for (Satellite sat : satellites) {
-            g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
-                    (int) sat.getY(),
-                    (int) sat.getDimension().getWidth(),
-                    (int) sat.getDimension().getHeight(), null);
-        }
-
+        this.wallpaper.simRender(g, d);
+        
         // Title
         final BufferedImage titlerender = header.render();
         g.drawImage(titlerender, (Window.WIDTH - titlerender.getWidth()) / 2, 40, null);
@@ -271,7 +194,7 @@ public class Title extends GUI {
         // UI Buttons
         Graphics2D g2d = (Graphics2D) g;
         final Composite neutral = g2d.getComposite();
-        final Color color1 = new Color(238, 0, 253), color2 = new Color(168, 0, 244);
+        final Color color1 = new Color(238, 0, 253), color2 = new Color(134, 0, 105);
         for (int i = 0; i < buttons.size(); i++) {
             final double ticks = 30.0;
             if (i * ticks / 2 > fadein)
@@ -281,23 +204,32 @@ public class Title extends GUI {
                 fade = smoothCurve((int) (fadein - i * ticks / 2), ticks, 100) / 100.0;
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fade));
             Rectangle field = actionfields.get(buttons.get(i).getTitle());
-            GradientPaint paint = new GradientPaint(0, field.height / 2, color1, field.width, field.height / 2, color2,
-                    true);
-            g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x,
-                    field.y + (int)((1.0-fade) * Button.square / 2), null);
+            if (hoverflow[i] > 0 && fade >= 1.0) {
+                GradientPaint paint;
+                final int shift = (int)(hoverflow[i] / 30.0 * field.width);
+                if (i % 2 == 0) {
+                    paint = new GradientPaint(shift, field.height / 2, color1, field.width + shift, field.height / 2, color2, false);
+                    g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x, field.y, null);
+                    paint = new GradientPaint(-(field.width - shift), field.height / 2, color3, shift, field.height / 2, color1, false);
+                    g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint).getSubimage(0, 0, shift, field.height), field.x, field.y, null);
+                } else {
+                    paint = new GradientPaint(-shift, field.height / 2, color1, field.width - shift, field.height / 2, color2, false);
+                    g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x, field.y, null);
+                    paint = new GradientPaint(field.width - shift, field.height / 2, color2, 2 * field.width - shift, field.height / 2, color3, false);
+                    g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint).getSubimage(field.width - shift, 0, shift, field.height), field.x + field.width - shift, field.y, null);
+                }
+            } else {
+                GradientPaint paint = new GradientPaint(0, field.height / 2, color1, field.width, field.height / 2, color2, true);
+                g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x,
+                        field.y + (int)((1.0-fade) * Button.square / 2), null);
+            }
         }
         g2d.setComposite(neutral);
     }
 
     public void tick() {
-        if (random.nextInt(60) < 1)
-            satellites.add(new Satellite());
-        for (int i = 0; i < satellites.size(); i++) {
-            Satellite sat = satellites.get(i);
-            sat.setX(sat.getX() + sat.getXVelocity());
-            if (sat.getX() > Window.WIDTH)
-                satellites.remove(i);
-        }
+        // Satellite wallpaper
+        this.wallpaper.tick();
 
         // Fade-in animation
         header.tick();
@@ -306,14 +238,30 @@ public class Title extends GUI {
 
         // Hover action
         Point mouse = Engine.getMousePoint();
+        for (int i = 0; i < buttons.size(); i++) {
+            if (hoverflow[i] > 0)
+                hoverflow[i]--;
+        }
         for (String title : actionfields.keySet()) {
             Rectangle field = actionfields.get(title);
             if (mouse.getX() < field.getX() || mouse.getX() > field.getX() + field.getWidth())
                 continue;
             if (mouse.getY() < field.getY() || mouse.getY() > field.getY() + field.getHeight())
                 continue;
-            // TODO Do something
-            System.out.println("Mouse is hovering over '" + title + "'!");
+            int index = -1;
+            for (int i = 0; i < buttons.size(); i++) {
+                if (buttons.get(i).getTitle() == title) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1)
+                break;
+            if (hoverflow[index] < 30)
+                hoverflow[index] += 2;
+            if (hoverflow[index] > 30)
+                hoverflow[index] = 30;
+            break;
         }
     }
 
@@ -324,8 +272,21 @@ public class Title extends GUI {
                 continue;
             if (e.getY() < field.getY() || e.getY() > field.getY() + field.getHeight())
                 continue;
-            // TODO Add whatever happens now
-            System.out.println("'" + title + "' has been clicked!");
+            switch (title) {
+                case "Open Lobby":
+                case "Join Lobby":
+                    Engine.getEngine().setState(Engine.UI.State.EXPLORER);
+                    break;
+                case Window.TITLE + " in a nutshell":
+                    Engine.getEngine().setState(Engine.UI.State.TUTORIAL);
+                    break;
+                case "Settings":
+                    Engine.getEngine().setState(Engine.UI.State.SETTINGS);
+                    break;
+                case "Credits":
+                    Engine.getEngine().setState(Engine.UI.State.CREDITS);
+                    break;
+            }
         }
     }
 
@@ -336,9 +297,20 @@ public class Title extends GUI {
                 final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
                 header = new Header(Window.TITLE, Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f), front, back);
                 fadein = 0;
+                Color[] colors = new Color[] {new Color(11, 255, 131), new Color(255, 254, 6), new Color(25, 254, 255)};
+                color3 = colors[random.nextInt(colors.length)];
             } catch(Exception x) {
                 x.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Returns the wallpaper of the title screen with all its satellite objects
+     * 
+     * @return the Background object
+     */
+    public Background getWallpaper() {
+        return this.wallpaper;
     }
 }
