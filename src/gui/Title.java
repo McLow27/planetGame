@@ -27,7 +27,7 @@ import src.Engine;
 import src.GUI;
 import src.obj.Header;
 
-public class Title extends GUI {
+public class Title extends GUI implements Start {
 
     /**
      * A random number generator for everything in this class
@@ -42,64 +42,9 @@ public class Title extends GUI {
      */
     private static Font font;
     /**
-     * The images of all asteroids and artifical satellites flying by in the background
-     */
-    private static BufferedImage[] sats;
-    /**
      * The path of this code, + "\\rsc" is the resource folder
      */
     static final String path = System.getProperty("user.dir");
-
-    static class Satellite {
-        private static final Random random = new Random();
-        private double x, y, r;
-        private double velX;
-        private Dimension dimension;
-        private int sat;
-
-        public Satellite() {
-            this.velX = (random.nextInt(50) + 10) / 12.0;
-            this.sat = random.nextInt(sats.length);
-            final int width = sats[this.sat].getWidth(), height = sats[this.sat].getHeight();
-            final int max = 140, min = 30;
-            double s;
-            do
-                s = random.nextInt(1000) / 750.0;
-            while (!(s * width < max && s * width > min));
-            this.dimension = new Dimension((int) (width * s), (int) (height * s));
-            this.x = -this.dimension.getWidth();
-            this.y = random.nextInt(Window.HEIGHT);
-            this.r = random.nextInt(360);
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-
-        public int getSatellite() {
-            return sat;
-        }
-
-        public double getRotation() {
-            return r;
-        }
-
-        public double getXVelocity() {
-            return velX;
-        }
-
-        public Dimension getDimension() {
-            return dimension;
-        }
-
-        public void setX(double x) {
-            this.x = x;
-        }
-    }
 
     static record Button(String title, Image icon) {
 
@@ -155,13 +100,9 @@ public class Title extends GUI {
     }
 
     /**
-     * The wallpaper in the background
+     * The background object with random moving satellites
      */
-    private BufferedImage wallpaper;
-    /**
-     * A linked list containing all the asteroids and artificial satellites in the background
-     */
-    private LinkedList<Satellite> satellites;
+    private Background wallpaper;
     /**
      * The tick of the fade-in animation of the buttons
      */
@@ -184,25 +125,16 @@ public class Title extends GUI {
     private Color color3;
 
     public Title() {
+        this(new Background());
+    }
+
+    public Title(Background wallpaper) {
         try {
             // Wallpaper
-            wallpaper = ImageIO.read(new File(path + "\\rsc\\title.png"));
+            this.wallpaper = wallpaper;
             // Random third color
             Color[] colors = new Color[] {new Color(11, 255, 131), new Color(255, 254, 6), new Color(25, 254, 255)};
             color3 = colors[random.nextInt(colors.length)];
-            // Background satellites
-            int len = new File(path + "\\rsc\\satellites\\").listFiles().length;
-            sats = new BufferedImage[len];
-            for (int i = 0; i < len; i++) {
-                sats[i] = ImageIO.read(new File(path + "\\rsc\\satellites\\satellite" + i + ".png"));
-            }
-            satellites = new LinkedList<Satellite>();
-            int r = random.nextInt(8) + 6;
-            for (int i = 0; i < r; i++) {
-                Satellite sat = new Satellite();
-                sat.setX(random.nextInt(Window.WIDTH));
-                satellites.add(sat);
-            }
             // Title and animation
             final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
             header = new Header(Window.TITLE, Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f), front, back);
@@ -253,25 +185,8 @@ public class Title extends GUI {
 
     public void simRender(Graphics g, double d) {
         // Wallpaper
-        int w = wallpaper.getWidth(), h = wallpaper.getHeight();
-        if (w / Window.WIDTH < h / Window.HEIGHT) {
-            h = h * Window.WIDTH / w;
-            w = Window.WIDTH;
-        } else {
-            w = w * Window.HEIGHT / h;
-            h = Window.HEIGHT;
-        }
-        g.drawImage(wallpaper, (Window.WIDTH - w) / 2, (Window.HEIGHT - h) / 2, w, h, null);
-
-        // Satellites
-        // TODO find out how to rotate the satellite
-        for (Satellite sat : satellites) {
-            g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
-                    (int) sat.getY(),
-                    (int) sat.getDimension().getWidth(),
-                    (int) sat.getDimension().getHeight(), null);
-        }
-
+        this.wallpaper.simRender(g, d);
+        
         // Title
         final BufferedImage titlerender = header.render();
         g.drawImage(titlerender, (Window.WIDTH - titlerender.getWidth()) / 2, 40, null);
@@ -313,14 +228,8 @@ public class Title extends GUI {
     }
 
     public void tick() {
-        if (random.nextInt(60) < 1)
-            satellites.add(new Satellite());
-        for (int i = 0; i < satellites.size(); i++) {
-            Satellite sat = satellites.get(i);
-            sat.setX(sat.getX() + sat.getXVelocity());
-            if (sat.getX() > Window.WIDTH)
-                satellites.remove(i);
-        }
+        // Satellite wallpaper
+        this.wallpaper.tick();
 
         // Fade-in animation
         header.tick();
@@ -363,8 +272,21 @@ public class Title extends GUI {
                 continue;
             if (e.getY() < field.getY() || e.getY() > field.getY() + field.getHeight())
                 continue;
-            // TODO Add whatever happens now
-            System.out.println("'" + title + "' has been clicked!");
+            switch (title) {
+                case "Open Lobby":
+                case "Join Lobby":
+                    Engine.getEngine().setState(Engine.UI.State.EXPLORER);
+                    break;
+                case Window.TITLE + " in a nutshell":
+                    Engine.getEngine().setState(Engine.UI.State.TUTORIAL);
+                    break;
+                case "Settings":
+                    Engine.getEngine().setState(Engine.UI.State.SETTINGS);
+                    break;
+                case "Credits":
+                    Engine.getEngine().setState(Engine.UI.State.CREDITS);
+                    break;
+            }
         }
     }
 
@@ -381,5 +303,14 @@ public class Title extends GUI {
                 x.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Returns the wallpaper of the title screen with all its satellite objects
+     * 
+     * @return the Background object
+     */
+    public Background getWallpaper() {
+        return this.wallpaper;
     }
 }

@@ -7,7 +7,12 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.MouseInfo;
+import src.gui.Explorer;
 import src.gui.Handler;
+import src.gui.Info;
+import src.gui.Lobby;
+import src.gui.Settings;
+import src.gui.Start;
 import src.gui.Title;
 
 /**
@@ -19,7 +24,7 @@ public class Engine extends Canvas implements Runnable {
 
     public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
     public static final String TITLE = "Working Title";
-    private static Canvas game;
+    private static Engine game;
     private Thread thread;
     private boolean running = false;
 
@@ -27,15 +32,19 @@ public class Engine extends Canvas implements Runnable {
      * This class is merely used for the InputAdapters to send input to the
      * currently displayed GUI since Java does not have pointers (kinda).
      */
-    static class UI {
+    public static class UI {
         /**
          * The current game state i.e. what is being displayed to the user
          */
-        static enum State {
+        public static enum State {
             TITLE,
             LOBBY,
-            NONE,
-            GAME;
+            CREDITS,
+            SETTINGS,
+            TUTORIAL,
+            EXPLORER,
+            GAME,
+            NONE;
         }
 
         private GUI ui;
@@ -162,14 +171,28 @@ public class Engine extends Canvas implements Runnable {
     public void setState(UI.State state) {
         switch (state) {
             case TITLE:
-                this.state.setState(new Title(), state);
+                if (this.state.getState() != UI.State.NONE && this.state.getUI() instanceof Start)
+                    this.state.setState(new Title(((Start) this.state.getUI()).getWallpaper()), state);
+                else
+                    this.state.setState(new Title(), state);
+                break;
+            case EXPLORER:
+                this.state.setState(new Explorer(((Start) this.state.getUI()).getWallpaper()), state);
                 break;
             case LOBBY:
-                // Not yet implemented -> NullPointerException
-                this.state.setState(null, state);
+                // TODO the whole client/server architecture and everything
+                this.state.setState(new Lobby(((Start) this.state.getUI()).getWallpaper(), null), state);
+                break;
+            case TUTORIAL:
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.TUTORIAL), state);
+                break;
+            case CREDITS:
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.CREDITS), state);
+                break;
+            case SETTINGS:
+                this.state.setState(new Settings(((Start) this.state.getUI()).getWallpaper()), state);
                 break;
             case GAME:
-                // Basically initialises a new game
                 this.state.setState(new Handler(), state);
                 break;
             default:
@@ -191,6 +214,15 @@ public class Engine extends Canvas implements Runnable {
         Point mouse = MouseInfo.getPointerInfo().getLocation();
         SwingUtilities.convertPointFromScreen(mouse, game);
         return mouse;
+    }
+
+    /**
+     * Get the static game engine object
+     * 
+     * @return the Engine object that is this game
+     */
+    public static Engine getEngine() {
+        return Engine.game;
     }
 
     /**
