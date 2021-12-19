@@ -21,6 +21,7 @@ import java.awt.FontMetrics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.event.MouseEvent;
+import java.awt.event.KeyEvent;
 import src.Window;
 import src.Engine;
 import src.GUI;
@@ -325,6 +326,19 @@ public class Title extends GUI {
                 continue;
             // TODO Add whatever happens now
             System.out.println("'" + title + "' has been clicked!");
+        }
+    }
+
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_F5) {
+            // Actually only for maintenance and development purposes
+            try{
+                final Color front = new Color(254, 251, 62), back = new Color(71, 233, 235);
+                header = new Header(Window.TITLE, Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\Righteous.ttf")).deriveFont(92f), front, back);
+                fadein = 0;
+            } catch(Exception x) {
+                x.printStackTrace();
+            }
         }
     }
 }

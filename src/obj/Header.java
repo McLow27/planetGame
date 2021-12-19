@@ -59,8 +59,8 @@ public class Header {
                     Graphics2D g = (Graphics2D) (b == 1 ? fr : bc).createGraphics();
                     g.drawImage(b == 1 ? this.front : this.back, -ln, -lnsum, null);
                     g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
-                    g.drawPolygon(new int[] {0, width, 0}, new int[] {-1, -1, width-1}, 3);
-                    g.drawPolygon(new int[] {0, width, width}, new int[] {height + width+1, height + width+1, height+1}, 3);
+                    g.fillPolygon(new int[] {0, width, 0}, new int[] {-1, -1, width-1}, 3);
+                    g.fillPolygon(new int[] {0, width, width}, new int[] {height + width+1, height + width+1, height+1}, 3);
                     g.dispose();
                 }
                 Graphics g = shard.getGraphics();
