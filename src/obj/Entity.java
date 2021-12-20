@@ -1,8 +1,6 @@
-package src.gui;
+package src.obj;
 
 import java.awt.Graphics;
-
-import src.obj.Type;
 
 public abstract class Entity {
 
