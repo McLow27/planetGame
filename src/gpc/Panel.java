@@ -1,4 +1,4 @@
-package src.obj;
+package src.gpc;
 
 import java.awt.image.BufferedImage;
 import java.awt.Dimension;

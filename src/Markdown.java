@@ -4,12 +4,14 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+
+import src.gpc.Panel;
+
 import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Canvas;
 import java.awt.Dimension;
-import src.obj.Panel;
 
 public class Markdown extends Panel {
 

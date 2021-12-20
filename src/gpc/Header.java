@@ -1,4 +1,4 @@
-package src.obj;
+package src.gpc;
 
 import java.awt.Font;
 import java.awt.Color;
