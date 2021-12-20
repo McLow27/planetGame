@@ -1,16 +1,14 @@
-package src;
+package src.gpc;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-
-import src.gpc.Panel;
-
 import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
 
 public class Markdown extends Panel {
@@ -18,6 +16,7 @@ public class Markdown extends Panel {
     private String markdown;
     private Font font;
     private float spacing = 2f;
+    private Color color = Color.WHITE;
     
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
@@ -65,6 +64,24 @@ public class Markdown extends Panel {
      */
     public float getSpacing() {
         return this.spacing;
+    }
+
+    /**
+     * Set the font color
+     * 
+     * @param color the new color of the font
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    /**
+     * Get the current font color
+     * 
+     * @return the color of the font
+     */
+    public Color getColor() {
+        return this.color;
     }
 
 }
