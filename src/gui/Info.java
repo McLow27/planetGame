@@ -8,7 +8,7 @@ import src.GUI;
 public class Info extends GUI implements Start {
 
     public static enum Markdown {
-        TUTORIAL, CREDITS;
+        TUTORIAL, CREDITS, SETTINGS;
     }
 
     private Background wallpaper;

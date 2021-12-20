@@ -11,7 +11,6 @@ import src.gui.Explorer;
 import src.gui.Handler;
 import src.gui.Info;
 import src.gui.Lobby;
-import src.gui.Settings;
 import src.gui.Start;
 import src.gui.Title;
 
@@ -190,7 +189,7 @@ public class Engine extends Canvas implements Runnable {
                 this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.CREDITS), state);
                 break;
             case SETTINGS:
-                this.state.setState(new Settings(((Start) this.state.getUI()).getWallpaper()), state);
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.SETTINGS), state);
                 break;
             case GAME:
                 this.state.setState(new Handler(), state);

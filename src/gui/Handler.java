@@ -3,6 +3,7 @@ package src.gui;
 import java.util.LinkedList;
 import java.awt.Graphics;
 import src.GUI;
+import src.obj.Entity;
 
 public class Handler extends GUI {
     LinkedList<Entity> objects = new LinkedList<Entity>();
