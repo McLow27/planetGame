@@ -233,8 +233,10 @@ public class Title extends GUI implements Start {
 
         // Fade-in animation
         header.tick();
-        if (fadein < 30 * (buttons.size()+1))
+        if (fadein < 30 * (buttons.size()+1)) {
             fadein++;
+            return;
+        }
 
         // Hover action
         Point mouse = Engine.getMousePoint();
