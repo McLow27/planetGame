@@ -5,7 +5,7 @@ import java.awt.Dimension;
 
 public abstract class Panel {
 
-    Dimension dimension;
+    protected Dimension dimension;
 
     public Panel(Dimension dimension) {
         this.dimension = dimension;
@@ -16,6 +16,8 @@ public abstract class Panel {
 
     public abstract BufferedImage render();
 
-    public abstract BufferedImage simRender(double delta);
+    public BufferedImage simRender(double delta) {
+        return render();
+    }
 
 }
