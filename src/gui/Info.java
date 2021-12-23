@@ -31,7 +31,7 @@ public class Info extends GUI implements Start {
             this.font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\NexaHeavy.ttf"));
             switch(this.info) {
                 case TUTORIAL:
-                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT/2), font.deriveFont(16f), new File(path + "\\rsc\\tutorial.md"));
+                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\tutorial.md"));
                     break;
                 case CREDITS:
                     // For Mason to do

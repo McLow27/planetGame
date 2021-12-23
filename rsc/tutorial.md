@@ -1,4 +1,4 @@
-# **Space Blitz** — Tutorial
+# **Space Blitz** - Tutorial
 
 ![](https://w0.peakpx.com/wallpaper/300/291/HD-wallpaper-sci-fi-black-hole-kurzgesagt-minimalist.jpg)
 
