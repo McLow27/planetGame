@@ -75,8 +75,7 @@ public class Info extends GUI implements Start {
     }
 
     public void mouseWheelMoved(MouseWheelEvent e) {
-        System.out.println("jiopsdf");
-        md.scroll(e.getScrollAmount());
+        md.scroll(e.getWheelRotation() * 4);
     }
 
 }

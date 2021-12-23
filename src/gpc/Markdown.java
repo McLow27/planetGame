@@ -75,19 +75,19 @@ public class Markdown extends Panel {
         for (String line : lines) {
             Matcher image = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
             if (image.find())
-                lns.add(line);
+                lns.add(line + "\n");
             else if (fm.stringWidth(line) > dimension.width) {
                 String total = "";
                 for (int i = 0; i < line.length(); i++) {
-                    if (fm.stringWidth(line.indexOf(" ", i) != -1 ? line.substring(i, line.indexOf(" ", i)) : total) >= dimension.width) {
+                    if (fm.stringWidth(total + (line.indexOf(" ", i) != -1 ? line.substring(i, line.indexOf(" ", i)) : "")) >= dimension.width) {
                         lns.add(total);
                         total = "";
                     }
                     total += line.charAt(i);
                 }
-                lns.add(total);
+                lns.add(total + "\n");
             } else
-                lns.add(line);
+                lns.add(line + "\n");
         }
         String[] result = new String[lns.size()];
         for (int i = 0; i < lns.size(); i++)
@@ -101,7 +101,6 @@ public class Markdown extends Panel {
 
     public BufferedImage simRender(double delta) {
         FontMetrics fm = new Canvas().getFontMetrics(font);
-        int height = fm.getHeight();
         BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.createGraphics();
         g.setFont(font);
@@ -119,28 +118,28 @@ public class Markdown extends Panel {
             String line = markdown[l];
             if (line.length() == 0)
                 continue;
-            if (lambda.check(new Pair<String, String>("^---$", line))) {
-                int h = 2;
-                g.fillRect(0, (int) (ly + (g.getFontMetrics().getHeight() - h) / 2), dimension.width, h);
-                ly += g.getFontMetrics().getHeight();
-                continue;
-            }
             Matcher matcher = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
             if (matcher.find()) {
                 String id = matcher.group(1);
                 if (imgs.get(id).getWidth(null) > dimension.width) {
-                    g.drawImage(imgs.get(id), 0, (int) ly, dimension.width, imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null), null);
+                    if (ly + imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null) > 0)
+                        g.drawImage(imgs.get(id), 0, (int) ly, dimension.width, imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null), null);
                     ly += imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null);
                 } else {
-                    g.drawImage(imgs.get(id), 0, (int) ly, null);
+                    if (ly + imgs.get(id).getHeight(null) > 0)
+                        g.drawImage(imgs.get(id), 0, (int) ly, null);
                     ly += imgs.get(id).getHeight(null);
                 }
                 continue;
-            }
-            if (lambda.check(new Pair<String, String>("#{1,5} .+", line))) {
+            } else if (lambda.check(new Pair<String, String>("#{1,5} .+", line))) {
                 String[] parts = line.split("\\s", 2);
                 fn = font.deriveFont(Font.PLAIN, (float) (font.getSize() * (2.2 - parts[0].length() / 5.0)));
                 line = parts[1];
+            } else if (lambda.check(new Pair<String, String>("^---$", line))) {
+                int h = 2;
+                g.fillRect(0, (int) (ly + (g.getFontMetrics().getHeight() - h) / 2), dimension.width, h);
+                ly += g.getFontMetrics().getHeight() + spacing;
+                continue;
             }
             g.setFont(fn);
             if (ly + g.getFontMetrics().getHeight() < 0) {
@@ -150,7 +149,17 @@ public class Markdown extends Panel {
             for (int c = 0; c < line.length(); c++) {
                 String r = line.substring(c), h = Character.toString(line.charAt(c));
                 Font f = g.getFont();
-                if (lambda.check(new Pair<String, String>("^[\\*_]{2}", r))) {
+                int height = g.getFontMetrics().getHeight();
+                if (h == "\n") {
+                    ly += spacing;
+                    break;
+                } else if (lambda.check(new Pair<String, String>("^-|\\* \\w+", line)) && c == 0) {
+                    lx = 6;
+                    int rd = 5;
+                    g.fillOval((int) lx, (int) ly + rd + height / 2, rd, rd);
+                    lx += rd;
+                    continue;
+                } else if (lambda.check(new Pair<String, String>("^[\\*_]{2}", r))) {
                     g.setFont(f.deriveFont(f.getStyle() == Font.BOLD ? Font.PLAIN : Font.BOLD));
                     ++c;
                     continue;
@@ -158,15 +167,10 @@ public class Markdown extends Panel {
                     g.setFont(f.deriveFont(f.getStyle() == Font.ITALIC ? Font.PLAIN : Font.ITALIC));
                     continue;
                 }
-
-                if (lx + g.getFontMetrics().stringWidth(r.indexOf(" ") != -1 ? r.substring(0, r.indexOf(" ")) : h) > dimension.width) {
-                    ly += g.getFontMetrics().getHeight();
-                    lx = 0;
-                }
                 g.drawString(h, (int) lx, (int) ly + height);
                 lx += g.getFontMetrics().stringWidth(h);
             }
-            ly += g.getFontMetrics().getHeight() + spacing;
+            ly += g.getFontMetrics().getHeight();
         }
         return img;
     }

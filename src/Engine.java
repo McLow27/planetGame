@@ -107,7 +107,9 @@ public class Engine extends Canvas implements Runnable {
         setState(UI.State.TITLE);
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
-        this.addMouseListener(new MouseInput(state));
+        MouseInput mi = new MouseInput(state);
+        this.addMouseListener(mi);
+        this.addMouseWheelListener(mi);
     }
 
     /**
