@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import src.Engine;
@@ -67,6 +68,15 @@ public class Info extends GUI implements Start {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
             Engine.getEngine().setState(Engine.UI.State.TITLE);
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && info == Tab.TUTORIAL)
+            md.scroll(2);
+        else if (e.getKeyCode() == KeyEvent.VK_UP && info == Tab.TUTORIAL)
+            md.scroll(-2);
+    }
+
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        System.out.println("jiopsdf");
+        md.scroll(e.getScrollAmount());
     }
 
 }

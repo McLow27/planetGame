@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.regex.*;
 import src.utl.Lambda.Bool;
@@ -26,13 +27,14 @@ public class Markdown extends Panel {
     private float spacing = 2f;
     private Color color = Color.WHITE;
     private boolean fadein = true;
+    private int scroll = 0;
 
     private HashMap<String, Image> imgs;
     
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
         this.font = font;
-        this.markdown = markdown.split("\\R");
+        this.markdown = this.format(markdown);
         this.imgs = loadImages(this.markdown);
     }
 
@@ -45,13 +47,13 @@ public class Markdown extends Panel {
             md += scan.nextLine() + "\n";
         };
         scan.close();
-        this.markdown = md.split("\\R");
+        this.markdown = this.format(md);
         this.imgs = loadImages(this.markdown);
     }
 
     private HashMap<String, Image> loadImages(String[] lines) {
         HashMap<String, Image> images = new HashMap<String, Image>();
-        for (String line : this.markdown) {
+        for (String line : lines) {
             Matcher image = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
             if (image.find()) {
                 try { 
@@ -59,11 +61,38 @@ public class Markdown extends Panel {
                     Image img = ImageIO.read(url);
                     images.put(image.group(1), img);
                 } catch (IOException e) {
-                    // handle IOException
+                    e.printStackTrace();
                 }
             }
         }
         return images;
+    }
+
+    private String[] format(String md) {
+        String[] lines = md.split("\\R");
+        LinkedList<String> lns = new LinkedList<String>();
+        FontMetrics fm = new Canvas().getFontMetrics(font);
+        for (String line : lines) {
+            Matcher image = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
+            if (image.find())
+                lns.add(line);
+            else if (fm.stringWidth(line) > dimension.width) {
+                String total = "";
+                for (int i = 0; i < line.length(); i++) {
+                    if (fm.stringWidth(line.indexOf(" ", i) != -1 ? line.substring(i, line.indexOf(" ", i)) : total) >= dimension.width) {
+                        lns.add(total);
+                        total = "";
+                    }
+                    total += line.charAt(i);
+                }
+                lns.add(total);
+            } else
+                lns.add(line);
+        }
+        String[] result = new String[lns.size()];
+        for (int i = 0; i < lns.size(); i++)
+            result[i] = lns.get(i);
+        return result;
     }
 
     public BufferedImage render() {
@@ -77,7 +106,7 @@ public class Markdown extends Panel {
         Graphics g = img.createGraphics();
         g.setFont(font);
         g.setColor(color);
-        float ly = 0;
+        float ly = -scroll;
         float lx = 0;  
         final Bool<Pair<String, String>> lambda = (tuple) -> {
             Pattern ptr = Pattern.compile(tuple.getAlpha());
@@ -86,26 +115,42 @@ public class Markdown extends Panel {
         };
         for (int l = 0; l < markdown.length && ly < dimension.height; l++) {
             Font fn = font;
+            lx = 0;
             String line = markdown[l];
             if (line.length() == 0)
                 continue;
+            if (lambda.check(new Pair<String, String>("^---$", line))) {
+                int h = 2;
+                g.fillRect(0, (int) (ly + (g.getFontMetrics().getHeight() - h) / 2), dimension.width, h);
+                ly += g.getFontMetrics().getHeight();
+                continue;
+            }
+            Matcher matcher = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
+            if (matcher.find()) {
+                String id = matcher.group(1);
+                if (imgs.get(id).getWidth(null) > dimension.width) {
+                    g.drawImage(imgs.get(id), 0, (int) ly, dimension.width, imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null), null);
+                    ly += imgs.get(id).getHeight(null) * dimension.width / imgs.get(id).getWidth(null);
+                } else {
+                    g.drawImage(imgs.get(id), 0, (int) ly, null);
+                    ly += imgs.get(id).getHeight(null);
+                }
+                continue;
+            }
             if (lambda.check(new Pair<String, String>("#{1,5} .+", line))) {
                 String[] parts = line.split("\\s", 2);
                 fn = font.deriveFont(Font.PLAIN, (float) (font.getSize() * (2.2 - parts[0].length() / 5.0)));
                 line = parts[1];
             }
             g.setFont(fn);
+            if (ly + g.getFontMetrics().getHeight() < 0) {
+                ly += g.getFontMetrics().getHeight() + spacing;
+                continue;
+            }
             for (int c = 0; c < line.length(); c++) {
                 String r = line.substring(c), h = Character.toString(line.charAt(c));
                 Font f = g.getFont();
-                Matcher matcher = Pattern.compile("!\\[\\]\\((\\S+)(\\s\".+\")?\\)").matcher(line);
-                if (c == 0 && matcher.find()) {
-                    String id = matcher.group(1);
-                    g.drawImage(imgs.get(id), 0, (int) ly, null);
-                    ly += imgs.get(id).getHeight(null);
-                    lx = 0;
-                    break;
-                } else if (lambda.check(new Pair<String, String>("^[\\*_]{2}", r))) {
+                if (lambda.check(new Pair<String, String>("^[\\*_]{2}", r))) {
                     g.setFont(f.deriveFont(f.getStyle() == Font.BOLD ? Font.PLAIN : Font.BOLD));
                     ++c;
                     continue;
@@ -122,7 +167,6 @@ public class Markdown extends Panel {
                 lx += g.getFontMetrics().stringWidth(h);
             }
             ly += g.getFontMetrics().getHeight() + spacing;
-            lx = 0;
         }
         return img;
     }
@@ -186,6 +230,19 @@ public class Markdown extends Panel {
      */
     public boolean isFadein() {
         return fadein;
+    }
+
+    public void scroll(int value) {
+        this.scroll += value;
+        if (this.scroll < 0)
+            this.scroll = 0;
+    }
+
+    public void setScroll(int value) {
+        if (value >= 0)
+            this.scroll = value;
+        else
+            this.scroll = 0;
     }
 
 }

@@ -6,7 +6,7 @@ _Space Blitz_ is a real-time strategy battle multiplayer game with sandbox and c
 
 ---
 ### Moons
-At the beginning of each round, all players get to choose a moon on which to start their colony. The moons all orbit a central planet and have different difficulties and advantages. The obstacle when trying to invade a hostile moon is that the defense is adapted to the moon’s unique terrain while the offense is not specialised for anything. Hence a good strategy is to invent and discover along the scientific tree of the moons one plans to attack and develop fitting technology.
+At the beginning of each round, all players get to choose a moon on which to start their colony. The moons all orbit a central planet and have different difficulties and advantages. The obstacle when trying to invade a hostile moon is that the defense is adapted to the moon's unique terrain while the offense is not specialised for anything. Hence a good strategy is to invent and discover along the scientific tree of the moons one plans to attack and develop fitting technology.
 
 ![](https://i.pinimg.com/originals/96/0c/5b/960c5bfc27899d17b010f80347a2cccb.png)
 
