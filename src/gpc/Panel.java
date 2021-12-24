@@ -20,4 +20,12 @@ public abstract class Panel {
         return render();
     }
 
+    public int getWidth() {
+        return dimension.width;
+    }
+
+    public int getHeight() {
+        return dimension.height;
+    }
+
 }

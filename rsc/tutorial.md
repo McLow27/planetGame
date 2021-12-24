@@ -2,7 +2,7 @@
 
 ![](https://w0.peakpx.com/wallpaper/300/291/HD-wallpaper-sci-fi-black-hole-kurzgesagt-minimalist.jpg)
 
-_Space Blitz_ is a real-time strategy battle multiplayer game with sandbox and city-building elements. It takes place around the planet Saturn where all players are dropped off on one of its diverse moons. Controlling an army of droids on the uninhabitable moons, the ultimate goal of the player is to advance in science and technology, and take over the hostile moons while defending and ensuring the survival of the own colony.
+_Space Blitz_ is a real-time strategy battle multiplayer game with sandbox and city-building elements. It takes place around the planet `Saturn` where all players are dropped off on one of its diverse moons. Controlling an army of droids on the uninhabitable moons, the ultimate goal of the player is to advance in science and technology, and take over the hostile moons while defending and ensuring the survival of the own colony. [Kurzgesagt](https://kurzgesagt.org/)
 
 ---
 ### Moons

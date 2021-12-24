@@ -3,10 +3,15 @@ package src.gui;
 import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Desktop;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.io.File;
+import java.net.URL;
 import src.Engine;
 import src.GUI;
 import src.Window;
@@ -76,6 +81,29 @@ public class Info extends GUI implements Start {
 
     public void mouseWheelMoved(MouseWheelEvent e) {
         md.scroll(e.getWheelRotation() * 4);
+    }
+
+    public void mousePressed(MouseEvent e) {
+        HashMap<String, Rectangle> links = md.getLinks();
+        int x = (Window.WIDTH - md.getWidth())/2, y = (Window.HEIGHT - md.getHeight())/2;
+        if ((e.getX() > x && e.getX() < x + md.getWidth()) && (e.getY() > y && e.getY() < y + md.getHeight())) {
+            int mx = e.getX() - x, my = e.getY() - y;
+            for (String link : links.keySet()) {
+                Rectangle r = links.get(link);
+                if (mx < r.getX() || mx > r.getX() + r.getWidth())
+                    continue;
+                if (my < r.getY() || my > r.getY() + r.getHeight())
+                    continue;
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        desktop.browse(new URL(link).toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
 }
