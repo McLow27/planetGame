@@ -11,7 +11,6 @@ import src.gui.Explorer;
 import src.gui.Handler;
 import src.gui.Info;
 import src.gui.Lobby;
-import src.gui.Settings;
 import src.gui.Start;
 import src.gui.Title;
 
@@ -108,7 +107,9 @@ public class Engine extends Canvas implements Runnable {
         setState(UI.State.TITLE);
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
-        this.addMouseListener(new MouseInput(state));
+        MouseInput mi = new MouseInput(state);
+        this.addMouseListener(mi);
+        this.addMouseWheelListener(mi);
     }
 
     /**
@@ -184,13 +185,13 @@ public class Engine extends Canvas implements Runnable {
                 this.state.setState(new Lobby(((Start) this.state.getUI()).getWallpaper(), null), state);
                 break;
             case TUTORIAL:
-                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.TUTORIAL), state);
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.TUTORIAL), state);
                 break;
             case CREDITS:
-                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Markdown.CREDITS), state);
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.CREDITS), state);
                 break;
             case SETTINGS:
-                this.state.setState(new Settings(((Start) this.state.getUI()).getWallpaper()), state);
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.SETTINGS), state);
                 break;
             case GAME:
                 this.state.setState(new Handler(), state);

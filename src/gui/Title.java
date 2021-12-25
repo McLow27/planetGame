@@ -23,9 +23,9 @@ import java.awt.image.BufferedImage;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
 import src.Window;
+import src.gpc.Header;
 import src.Engine;
 import src.GUI;
-import src.obj.Header;
 
 public class Title extends GUI implements Start {
 
@@ -233,8 +233,10 @@ public class Title extends GUI implements Start {
 
         // Fade-in animation
         header.tick();
-        if (fadein < 30 * (buttons.size()+1))
+        if (fadein < 30 * (buttons.size()+1)) {
             fadein++;
+            return;
+        }
 
         // Hover action
         Point mouse = Engine.getMousePoint();

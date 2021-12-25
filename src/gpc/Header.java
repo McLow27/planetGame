@@ -1,4 +1,4 @@
-package src.obj;
+package src.gpc;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -10,15 +10,16 @@ import java.awt.Rectangle;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Dimension;
 import java.util.Random;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import src.Window;
+import src.utl.Tuple.Pair;
+import src.utl.Tuple.Triple;
 import src.GUI;
-import src.Tuple.Pair;
-import src.Tuple.Triple;
 
-public class Header {
+public class Header extends Panel {
     private static final int offset = 4;
     private BufferedImage front, back;
     private LinkedList<LinkedList<Pair<BufferedImage, Short>>> bits;
@@ -26,6 +27,8 @@ public class Header {
     private short t = 0;
 
     public Header(String header, Font font, Color front, Color back) {
+        super(new Dimension(new Canvas().getFontMetrics(font).stringWidth(Window.TITLE) + offset,
+        new Canvas().getFontMetrics(font).getHeight() + new Canvas().getFontMetrics(font).getDescent() + offset));
         // Titles
         FontMetrics fm = new Canvas().getFontMetrics(font);
         final Consumer<Boolean> render = (fslashb) -> {
