@@ -15,9 +15,9 @@ import java.util.Random;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import src.Window;
+import src.utl.Tuple.Pair;
+import src.utl.Tuple.Triple;
 import src.GUI;
-import src.Tuple.Pair;
-import src.Tuple.Triple;
 
 public class Header extends Panel {
     private static final int offset = 4;

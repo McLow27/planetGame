@@ -1,26 +1,52 @@
 package src.gui;
 
 import java.awt.Graphics;
+import java.awt.Font;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.Desktop;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.io.File;
+import java.net.URL;
 import src.Engine;
 import src.GUI;
+import src.Window;
+import src.gpc.Markdown;
 
 public class Info extends GUI implements Start {
 
-    public static enum Markdown {
+    public static enum Tab {
         TUTORIAL, CREDITS, SETTINGS;
     }
 
+    private final String path = System.getProperty("user.dir");
+    private Font font;
     private Background wallpaper;
-    private Markdown info;
+    private Tab info;
+    private Markdown md;
 
-    public Info(Background wallpaper, Markdown info) {
-        this.wallpaper = wallpaper;
-        this.info = info;
-        if (this.info == Markdown.TUTORIAL) {
 
-        } else if (this.info == Markdown.CREDITS) {
-
+    public Info(Background wallpaper, Tab info) {
+        try {
+            this.wallpaper = wallpaper;
+            this.info = info;
+            this.font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\NexaHeavy.ttf"));
+            switch(this.info) {
+                case TUTORIAL:
+                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\tutorial.md"));
+                    break;
+                case CREDITS:
+                    // For Mason to do
+                    break;
+                case SETTINGS:
+                    break;
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -30,6 +56,10 @@ public class Info extends GUI implements Start {
 
     public void simRender(Graphics g, double d) {
         this.wallpaper.simRender(g, d);
+        if (md != null) {
+            BufferedImage rend = md.render();
+            g.drawImage(rend, (Window.WIDTH - rend.getWidth())/2, (Window.HEIGHT - rend.getHeight())/2, null);
+        }
     }
 
     public void tick() {
@@ -43,6 +73,37 @@ public class Info extends GUI implements Start {
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
             Engine.getEngine().setState(Engine.UI.State.TITLE);
+        if (e.getKeyCode() == KeyEvent.VK_DOWN && info == Tab.TUTORIAL)
+            md.scroll(2);
+        else if (e.getKeyCode() == KeyEvent.VK_UP && info == Tab.TUTORIAL)
+            md.scroll(-2);
+    }
+
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        md.scroll(e.getWheelRotation() * 4);
+    }
+
+    public void mousePressed(MouseEvent e) {
+        HashMap<String, Rectangle> links = md.getLinks();
+        int x = (Window.WIDTH - md.getWidth())/2, y = (Window.HEIGHT - md.getHeight())/2;
+        if ((e.getX() > x && e.getX() < x + md.getWidth()) && (e.getY() > y && e.getY() < y + md.getHeight())) {
+            int mx = e.getX() - x, my = e.getY() - y;
+            for (String link : links.keySet()) {
+                Rectangle r = links.get(link);
+                if (mx < r.getX() || mx > r.getX() + r.getWidth())
+                    continue;
+                if (my < r.getY() || my > r.getY() + r.getHeight())
+                    continue;
+                Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        desktop.browse(new URL(link).toURI());
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
 }

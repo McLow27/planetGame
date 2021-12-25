@@ -14,7 +14,7 @@ public class Background extends GUI {
 
     static class Satellite {
         private static final Random random = new Random();
-        private double x, y, r;
+        private double x, y;
         private double velX;
         private Dimension dimension;
         private int sat;
@@ -31,7 +31,6 @@ public class Background extends GUI {
             this.dimension = new Dimension((int) (width * s), (int) (height * s));
             this.x = -this.dimension.getWidth();
             this.y = random.nextInt(Window.HEIGHT);
-            this.r = random.nextInt(360);
         }
 
         public double getX() {
@@ -44,10 +43,6 @@ public class Background extends GUI {
 
         public int getSatellite() {
             return sat;
-        }
-
-        public double getRotation() {
-            return r;
         }
 
         public double getXVelocity() {
@@ -135,7 +130,6 @@ public class Background extends GUI {
         g.drawImage(wallpaper, (Window.WIDTH - w) / 2, (Window.HEIGHT - h) / 2, w, h, null);
 
         // Satellites
-        // TODO find out how to rotate the satellite
         for (Satellite sat : satellites) {
             g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
                     (int) sat.getY(),
