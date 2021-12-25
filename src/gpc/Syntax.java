@@ -3,12 +3,19 @@ package src.gpc;
 import java.net.URL;
 import java.awt.Rectangle;
 import java.awt.Image;
+import java.awt.Point;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
+import src.utl.Lambda.Yield;
+import src.utl.Tuple.Pair;
 
 public abstract class Syntax {
     
     protected static Pattern pattern;
+
+    public static boolean check(String lines) {
+        return pattern.matcher(lines).find();
+    }
 
     public class Paragraph extends Syntax {
         public static final Pattern pattern = Pattern.compile("");
@@ -81,10 +88,18 @@ public abstract class Syntax {
     public static Syntax[] compile(String[] markdown) {
         LinkedList<Syntax> syntax = new LinkedList<Syntax>();
 
-
-        // Iterate the syntax lines
+        Yield<Pair<String[], Integer>, String> join = (array) -> {
+            String joined = "";
+            for (int i = array.getBeta(); i < array.getAlpha().length; i++)
+                joined += array.getAlpha()[i] + "\n";
+            return joined.strip();
+        };
+        // Iterate the markdown
         for (int l = 0; l < markdown.length; l++) {
-
+            String line = markdown[l], next = join.yield(new Pair<String[], Integer>(markdown, l));
+            // Assigning a section type
+            if (MarkdownImage.check(line))
+                ;
         }
 
         Syntax[] array = new Syntax[syntax.size()];

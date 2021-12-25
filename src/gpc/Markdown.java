@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 
 public class Markdown extends Panel {
 
-    private String[] markdown;
+    private Syntax[] markdown;
     private Font font;
     private float spacing = 2f;
     private Color color = Color.WHITE;
@@ -23,7 +23,7 @@ public class Markdown extends Panel {
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
         this.font = font;
-        this.markdown = markdown.split("\\R");
+        this.markdown = Syntax.compile(markdown.split("\\R"));
     }
 
     public Markdown(Dimension dimension, Font font, File markdown) throws FileNotFoundException {
@@ -35,7 +35,7 @@ public class Markdown extends Panel {
             md += scan.nextLine() + "\n";
         };
         scan.close();
-        this.markdown = md.split("\\R");
+        this.markdown = Syntax.compile(md.split("\\R"));
     }
 
     public BufferedImage render() {
