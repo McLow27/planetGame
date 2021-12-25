@@ -156,9 +156,23 @@ public class Markdown extends Panel {
                 g.fillRect(0, (int) (ly + (g.getFontMetrics().getHeight() - h) / 2), dimension.width, h);
                 ly += g.getFontMetrics().getHeight() + spacing;
                 continue;
-            } else if(lambda.check(new Pair<String, String>("^\\d\\. \\w+", line))) {
+            } else if (lambda.check(new Pair<String, String>("^\\d\\. \\w+", line))) {
                 // Ordered list
                 lx = 6;
+            } else if (lambda.check(new Pair<String, String>("\\|(.+?\\|)+", line)) && lambda.check(new Pair<String, String>("\\|(\s?-+\s?\\|)+", markdown[l+1]))) {
+                int rows = line.split("\\|").length;
+                LinkedList<String[]> table = new LinkedList<String[]>();
+                l+=2;
+                while(l < markdown.length && ly < dimension.height && lambda.check(new Pair<String, String>("\\|(.+?\\|)+", line))) {
+                    String[] column = markdown[l].split("\\|");
+                }
+                int[] max = new int[table.get(0).length];
+                for (int c = 0; c < table.size(); c++) {
+                    for (int r = 0; r < max.length; r++) {
+                        if (max[r] < table.get(c)[r].strip().length())
+                            max[r] = table.get(c)[r].strip().length();
+                    }
+                }
             }
             g.setFont(fn);
             if (ly + g.getFontMetrics().getHeight() < 0) {
@@ -216,9 +230,19 @@ public class Markdown extends Panel {
                         // Draw the character without formatting
                         g.drawString(Character.toString(h), (int) lx, (int) ly + height);
                         lx += g.getFontMetrics().stringWidth(Character.toString(h));
+                        // Jump to next line if necessary
+                        if (c == line.length()) {
+                            lx = 0;
+                            c = 0;
+                            ly += g.getFontMetrics().getHeight();
+                            l++;
+                        }
                     } while (h != '`');
                     g.setColor(this.color);
                     continue;
+                } else if (lambda.check(new Pair<String, String>("^==.*?==", r))) {
+                    // Highlight
+                    g.setColor(g.getColor() == this.highlight ? this.color : this.highlight);
                 }
                 // Draw the character
                 g.drawString(Character.toString(h), (int) lx, (int) ly + height);
