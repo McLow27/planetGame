@@ -13,22 +13,20 @@ import java.awt.image.BufferedImage;
 public class Markdown extends Panel {
 
     private Syntax[] markdown;
-    private Font font;
-    private float spacing = 2f;
-    private Color color = Color.WHITE;
-    private Color code = new Color(11, 255, 131), highlight = new Color(255, 254, 6), link = new Color(25, 254, 255);
     private boolean fadein = true;
     private int scroll = 0;
     
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
-        this.font = font;
+        Syntax.font = font;
+        Syntax.width = dimension.width;
         this.markdown = Syntax.compile(markdown.split("\\R"));
     }
 
     public Markdown(Dimension dimension, Font font, File markdown) throws FileNotFoundException {
         super(dimension);
-        this.font = font;
+        Syntax.font = font;
+        Syntax.width = dimension.width;
         Scanner scan = new Scanner(markdown);
         String md = "";
         while (scan.hasNext()) {
@@ -55,8 +53,8 @@ public class Markdown extends Panel {
      * 
      * @param spacing a float value denoting the spacing
      */
-    public void setSpacing(float spacing) {
-        this.spacing = spacing;
+    public void setSpacing(int spacing) {
+        Syntax.spacing = spacing;
     }
 
     /**
@@ -65,7 +63,7 @@ public class Markdown extends Panel {
      * @return a float value denoting the spacing
      */
     public float getSpacing() {
-        return this.spacing;
+        return Syntax.spacing;
     }
 
     /**
@@ -74,7 +72,7 @@ public class Markdown extends Panel {
      * @param color the new color of the font
      */
     public void setColor(Color color) {
-        this.color = color;
+        Syntax.color = color;
     }
 
     /**
@@ -83,7 +81,7 @@ public class Markdown extends Panel {
      * @return the color of the font
      */
     public Color getColor() {
-        return this.color;
+        return Syntax.color;
     }
 
     /**
@@ -140,7 +138,7 @@ public class Markdown extends Panel {
      * @param highlight the color of highlighted sections
      */
     public void setHighlight(Color highlight) {
-        this.highlight = highlight;
+        Syntax.highlight = highlight;
     }
 
     /**
@@ -149,7 +147,7 @@ public class Markdown extends Panel {
      * @return the color of highlighted sections
      */
     public Color getHighlight() {
-        return this.highlight;
+        return Syntax.highlight;
     }
 
     /**
@@ -158,7 +156,7 @@ public class Markdown extends Panel {
      * @param link the color of links
      */
     public void setLink(Color link) {
-        this.link = link;
+        Syntax.link = link;
     }
 
     /**
@@ -167,7 +165,7 @@ public class Markdown extends Panel {
      * @return the color of links
      */
     public Color getLink() {
-        return this.link;
+        return Syntax.link;
     }
 
     /**
@@ -176,7 +174,7 @@ public class Markdown extends Panel {
      * @param code the color of code sections
      */
     public void setCode(Color code) {
-        this.code = code;
+        Syntax.code = code;
     }
 
     /**
@@ -185,7 +183,7 @@ public class Markdown extends Panel {
      * @return the color of code sections
      */
     public Color getCode() {
-        return this.code;
+        return Syntax.code;
     }
 
     /**
