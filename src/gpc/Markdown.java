@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.LinkedList;
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 public class Markdown extends Panel {
@@ -15,12 +17,29 @@ public class Markdown extends Panel {
     private Syntax[] markdown;
     private boolean fadein = true;
     private int scroll = 0;
-    
+
+    private String[] split(String str, char rgx) {
+        LinkedList<String> list = new LinkedList<String>();
+        String buffer = "";
+        for (char c : str.toCharArray()) {
+            if (c == rgx) {
+                list.add(buffer.strip());
+                buffer = "";
+                continue;
+            }
+            buffer += c;
+        }
+        String[] result = new String[list.size()];
+        for (int i = 0; i < list.size(); i++)
+            result[i] = list.get(i);
+        return result;
+    }
+
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
         Syntax.font = font;
         Syntax.width = dimension.width;
-        this.markdown = Syntax.compile(markdown.split("\\R"));
+        this.markdown = Syntax.compile(this.split(markdown, '\n'));
     }
 
     public Markdown(Dimension dimension, Font font, File markdown) throws FileNotFoundException {
@@ -33,7 +52,7 @@ public class Markdown extends Panel {
             md += scan.nextLine() + "\n";
         };
         scan.close();
-        this.markdown = Syntax.compile(md.split("\\R"));
+        this.markdown = Syntax.compile(this.split(md, '\n'));
     }
 
     public BufferedImage render() {
@@ -45,6 +64,14 @@ public class Markdown extends Panel {
      */
     public BufferedImage simRender(double delta) {
         BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = img.createGraphics();
+        int y = 0;
+        for (Syntax element : markdown) {
+            if (y + element.getHeight() >= scroll && y < scroll + dimension.height)
+                element.render(g, y);
+            System.out.println(y);
+            y += element.getHeight() + Syntax.spacing;
+        }
         return img;
     }
 
