@@ -22,7 +22,7 @@ import src.utl.Tuple.Pair;
 public abstract class Syntax {
     
     public static Font font;
-    public static int spacing = 2;
+    public static int spacing = 7;
     public static Color color = Color.WHITE;
     public static Color code = new Color(11, 255, 131), highlight = new Color(255, 254, 6), link = new Color(25, 254, 255);
     public static int width;
@@ -106,12 +106,12 @@ public abstract class Syntax {
         FontMetrics fm = g.getFontMetrics();
         g.setColor(color);
         boolean _escape = false, _strike = false, _link = false;
-        int x = 0, y = 0;
+        int x = box.x, y = box.y;
         for (int c = 0; c < str.length(); c++) {
             char ch = str.charAt(c), nx = c < str.length() - 1 ? str.charAt(c + 1) : '\0';
             if((ch == '\s' && fm.stringWidth(str.substring(c, str.indexOf(' ', c + 1) == -1 ? str.length() : str.indexOf(' ', c + 1))) + x > box.width) || ch == '\n') {
                 y += fm.getHeight();
-                x = 0;
+                x = box.x;
                 continue;
             }
             if (!_escape) {
@@ -200,7 +200,7 @@ public abstract class Syntax {
                         y + fm.getAscent() + fm.getLeading()/2);
             x += fm.stringWidth(Character.toString(ch));
         }
-        return y + fm.getHeight() - box.x;
+        return y + fm.getHeight() - box.y;
     }
 
     public abstract void render(Graphics g, int y);
@@ -300,18 +300,18 @@ public abstract class Syntax {
         public Heading(String markdown, Point point) {
             Matcher m = pattern.matcher(markdown);
             m.find();
-            this.level = m.group(1).length();
+            this.level = 6 - m.group(1).length();
             this.text = m.group(2);
             this.dimension = new Rectangle(point, simulate(point));
         }
 
         private Dimension simulate(Point point) {
-            return rawText(new Rectangle(point.x, point.y, Syntax.width, -1), Syntax.font.deriveFont((int) (Syntax.font.getSize() * (1.0 + level / 5.0))), this.text);
+            return rawText(new Rectangle(point.x, point.y, Syntax.width, -1), Syntax.font.deriveFont((float) (Syntax.font.getSize() * (1.0 + level / 5.0))), this.text);
         }
 
         public void render(Graphics g, int y) {
             g.setColor(color);
-            g.setFont(Syntax.font.deriveFont((int) (Syntax.font.getSize() * (1.0 + level / 5.0))));
+            g.setFont(Syntax.font.deriveFont((float) (Syntax.font.getSize() * (1.0 + level / 5.0))));
             renderText(new Rectangle(0, y, dimension.width, dimension.height), g, text);
         }
         
@@ -351,11 +351,23 @@ public abstract class Syntax {
          * An ordered list with digits as identifiers
          */
         public static class OrderedList extends List {
-            public static final Pattern pattern = Pattern.compile("^\\d\\. .+?\\n(?:\\d\\. .+\\n?)*");
+            public static final Pattern pattern = Pattern.compile("^\\d\\. .+?\\n(?:\\d\\.\\s?.+\\n?)*");
 
             public OrderedList(String markdown, Point point) {
-                super(markdown.split("\\R"));
+                super(extract(markdown));
                 this.dimension = new Rectangle(point, simulate(point));
+            }
+
+            private static String[] extract(String md) {
+                Matcher m = pattern.matcher(md);
+                m.find();
+                LinkedList<String> items = new LinkedList<String>();
+                for (String item : m.group(0).split("\\R"))
+                    items.add(item.substring(1).strip());
+                String[] result = new String[items.size()];
+                for (int i = 0; i < items.size(); i++)
+                    result[i] = items.get(i);
+                return result;
             }
             
             public static boolean check(String lines) {
@@ -365,8 +377,9 @@ public abstract class Syntax {
             public void render(Graphics g, int y) {
                 g.setColor(color);
                 g.setFont(font);
+                int c = 0;
                 for (String item : items) {
-                    String iden = item.substring(0, item.indexOf('\s'));
+                    String iden = ++c + ". ";
                     g.drawString(iden, 16 - g.getFontMetrics().stringWidth(iden), y);
                     y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, item.substring(item.indexOf('\s')));
                 }
@@ -377,11 +390,23 @@ public abstract class Syntax {
          * An unordered list with either asterisks or hyphens instead of identifiers
          */
         public static class UnorderedList extends List {
-            public static final Pattern pattern = Pattern.compile("^([-\\*]) .+?\n(?:\1 .+\n?)*");
+            public static final Pattern pattern = Pattern.compile("^([-\\*]) .+?\\n(?:\\1\\s?.+\\n?)*");
 
             public UnorderedList(String markdown, Point point) {
-                super(markdown.split("\\R"));
+                super(extract(markdown));
                 this.dimension = new Rectangle(point, simulate(point));
+            }
+
+            private static String[] extract(String md) {
+                Matcher m = pattern.matcher(md);
+                m.find();
+                LinkedList<String> items = new LinkedList<String>();
+                for (String item : m.group(0).split("\\R"))
+                    items.add(item.substring(1).strip());
+                String[] result = new String[items.size()];
+                for (int i = 0; i < items.size(); i++)
+                    result[i] = items.get(i);
+                return result;
             }
     
             public static boolean check(String lines) {
@@ -392,10 +417,9 @@ public abstract class Syntax {
                 g.setColor(color);
                 g.setFont(font);
                 for (String item : items) {
-                    String iden = item.substring(0, item.indexOf('\s'));
                     int rad = 3;
                     g.fillOval(16 - rad, (g.getFontMetrics().getHeight() - rad) / 2, rad, rad);
-                    y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, item.substring(item.indexOf('\s')));
+                    y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, item);
                 }
             }
         }

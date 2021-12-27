@@ -53,6 +53,8 @@ public class Markdown extends Panel {
         };
         scan.close();
         this.markdown = Syntax.compile(this.split(md, '\n'));
+        for (Syntax s : this.markdown)
+            System.out.println(s.getClass().getName());
     }
 
     public BufferedImage render() {
@@ -65,11 +67,10 @@ public class Markdown extends Panel {
     public BufferedImage simRender(double delta) {
         BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.createGraphics();
-        int y = 0;
+        int y = -scroll;
         for (Syntax element : markdown) {
-            if (y + element.getHeight() >= scroll && y < scroll + dimension.height)
+            if (!(y + element.getHeight() < 0 || y > dimension.height))
                 element.render(g, y);
-            System.out.println(y);
             y += element.getHeight() + Syntax.spacing;
         }
         return img;
