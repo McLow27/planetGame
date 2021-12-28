@@ -28,7 +28,7 @@ public abstract class Syntax {
     public static int width;
 
     public static final char[][] formatting = new char[][] {
-        {'*', '*'}, {'*', '\0'}, {'~', '~'}, {'`', '\0'}, {'~', '\0'}, {'^', '\0'}, {'[', '^'}, {'=', '='}
+        {'*', '*'}, {'*', '\0'}, {'_', '_'}, {'_', '\0'}, {'~', '~'}, {'`', '\0'}, {'~', '\0'}, {'^', '\0'}, {'[', '^'}, {'=', '='}
     };
 
     protected Rectangle dimension;
@@ -130,12 +130,12 @@ public abstract class Syntax {
                     // Escaped characters
                     _escape = true;
                     continue;
-                } else if (ch == '*' && nx == '*') {
+                } else if ((ch == '*' && nx == '*') || (ch == '_' && nx == '_')) {
                     // Bold
                     g.setFont(g.getFont().deriveFont(g.getFont().getStyle() == Font.PLAIN ? Font.BOLD : Font.PLAIN));
                     c++;
                     continue;
-                } else if (ch == '*') {
+                } else if (ch == '*' || ch == '_') {
                     // Italic
                     g.setFont(g.getFont().deriveFont(g.getFont().getStyle() == Font.PLAIN ? Font.ITALIC : Font.PLAIN));
                     continue;

@@ -3,6 +3,7 @@ package src.gui;
 import java.awt.Graphics;
 import java.awt.Font;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Desktop;
 import java.awt.event.KeyEvent;
@@ -10,6 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.net.URL;
 import src.Engine;
@@ -28,7 +30,7 @@ public class Info extends GUI implements Start {
     private Background wallpaper;
     private Tab info;
     private Markdown md;
-
+    private BufferedImage[] pfps;
 
     public Info(Background wallpaper, Tab info) {
         try {
@@ -37,10 +39,13 @@ public class Info extends GUI implements Start {
             this.font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\NexaHeavy.ttf"));
             switch(this.info) {
                 case TUTORIAL:
-                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\test.md"));
+                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\tutorial.md"));
                     break;
                 case CREDITS:
-                    // For Mason to do
+                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\credits.md"));
+                    pfps = new BufferedImage[4];
+                    for (int i = 1; i <= 4; i++)
+                        pfps[i-1] = ImageIO.read(new File(path + "\\rsc\\pfp" + i + ".png"));
                     break;
                 case SETTINGS:
                     break;
@@ -59,6 +64,14 @@ public class Info extends GUI implements Start {
         if (md != null) {
             BufferedImage rend = md.render();
             g.drawImage(rend, (Window.WIDTH - rend.getWidth())/2, (Window.HEIGHT - rend.getHeight())/2, null);
+        }
+        if (info == Tab.CREDITS) {
+            for (int i = 0; i < pfps.length; i++) {
+                Dimension m = new Dimension(Window.WIDTH/4, Window.HEIGHT/2);
+                Point p = new Point(i / 2 == 0 ? 0 : m.width * 3, i % 2 * m.height);
+                int s = m.height / 2;
+                g.drawImage(pfps[i], p.x + (m.width - s) / 2, p.y + (m.height - s) / 2, s, s, null);
+            }
         }
     }
 

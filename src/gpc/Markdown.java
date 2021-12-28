@@ -145,6 +145,11 @@ public class Markdown extends Panel {
         this.scroll += value;
         if (this.scroll < 0)
             this.scroll = 0;
+        int y = 0;
+        for (Syntax element : markdown)
+            y += element.getHeight() + Syntax.spacing;
+        if (y - dimension.height + 60 < this.scroll)
+            this.scroll = y - dimension.height + 60;
     }
 
     /**
@@ -155,8 +160,15 @@ public class Markdown extends Panel {
     public void setScroll(int value) {
         if (value >= 0)
             this.scroll = value;
-        else
-            this.scroll = 0;
+        else {
+            int y = 0;
+            for (Syntax element : markdown)
+                y += element.getHeight() + Syntax.spacing;
+            if (y - dimension.height + 60 < this.scroll)
+                this.scroll = y - dimension.height + 60;
+            else
+                this.scroll = 0;
+        }
     }
 
     /**
