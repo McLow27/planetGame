@@ -23,7 +23,7 @@ public class Markdown extends Panel {
         String buffer = "";
         for (char c : str.toCharArray()) {
             if (c == rgx) {
-                list.add(buffer.strip());
+                list.add(buffer);
                 buffer = "";
                 continue;
             }
@@ -53,8 +53,6 @@ public class Markdown extends Panel {
         };
         scan.close();
         this.markdown = Syntax.compile(this.split(md, '\n'));
-        for (Syntax s : this.markdown)
-            System.out.println(s.getClass().getName());
     }
 
     public BufferedImage render() {

@@ -22,7 +22,7 @@ import src.utl.Tuple.Pair;
 public abstract class Syntax {
     
     public static Font font;
-    public static int spacing = 7;
+    public static int spacing = 12;
     public static Color color = Color.WHITE;
     public static Color code = new Color(11, 255, 131), highlight = new Color(255, 254, 6), link = new Color(25, 254, 255);
     public static int width;
@@ -53,8 +53,7 @@ public abstract class Syntax {
      * @return    the minimum width (only useful with multiline text) and the required height
      */
     public static Dimension rawText(Rectangle box, Font f, String str) {
-        int height = box.height;
-        int width = 0;
+        int height = 0, width = 0;
         String line = "";
         FontMetrics fm = new Canvas().getFontMetrics(f);
         boolean escflag = false;
@@ -91,7 +90,9 @@ public abstract class Syntax {
         }
         if (line.length() > 0)
             height += fm.getHeight();
-        return new Dimension(Syntax.width, height);
+        if (width == 0)
+            width = fm.stringWidth(line);
+        return new Dimension(width, height);
     }
 
     /**
@@ -109,7 +110,7 @@ public abstract class Syntax {
         int x = box.x, y = box.y;
         for (int c = 0; c < str.length(); c++) {
             char ch = str.charAt(c), nx = c < str.length() - 1 ? str.charAt(c + 1) : '\0';
-            if((ch == '\s' && fm.stringWidth(str.substring(c, str.indexOf(' ', c + 1) == -1 ? str.length() : str.indexOf(' ', c + 1))) + x > box.width) || ch == '\n') {
+            if((ch == '\s' && fm.stringWidth(str.substring(c, str.indexOf(' ', c + 1) == -1 ? str.length() : str.indexOf(' ', c + 1))) + x > box.width + box.x) || ch == '\n') {
                 y += fm.getHeight();
                 x = box.x;
                 continue;
@@ -121,12 +122,12 @@ public abstract class Syntax {
                     continue;
                 } else if (ch == '*' && nx == '*') {
                     // Bold
-                    g.setFont(g.getFont().deriveFont(Font.BOLD));
+                    g.setFont(g.getFont().deriveFont(g.getFont().getStyle() == Font.PLAIN ? Font.BOLD : Font.PLAIN));
                     c++;
                     continue;
                 } else if (ch == '*') {
                     // Italic
-                    g.setFont(g.getFont().deriveFont(Font.ITALIC));
+                    g.setFont(g.getFont().deriveFont(g.getFont().getStyle() == Font.PLAIN ? Font.ITALIC : Font.PLAIN));
                     continue;
                 } else if (ch == '~' && nx == '~') {
                     // Strikethrough
@@ -139,34 +140,38 @@ public abstract class Syntax {
                     continue;
                 } else if (ch == '~') {
                     // Subscript
-                    g.setFont(g.getFont().deriveFont(g.getFont().getSize() / 2));
-                    c++;
+                    float size = g.getFont().getSize();
+                    g.setFont(g.getFont().deriveFont((float) (g.getFont().getSize() / 1.5)));
                     FontMetrics fm2 = g.getFontMetrics();
-                    while (str.charAt(c) != '~') {
-                        g.drawString(Character.toString(str.charAt(c)), x, y + fm.getHeight() - (fm2.getAscent() + fm2.getLeading()));
-                        x += fm.stringWidth(Character.toString(str.charAt(c)));
+                    while (str.charAt(++c) != '~') {
+                        g.drawString(Character.toString(str.charAt(c)), x, y + fm.getHeight());
+                        x += fm2.stringWidth(Character.toString(str.charAt(c)));
                     }
+                    g.setFont(g.getFont().deriveFont(size));
                     continue;
                 } else if (ch == '^' ) {
                     // Superscript
-                    g.setFont(g.getFont().deriveFont(g.getFont().getSize() / 2));
-                    c++;
+                    float size = g.getFont().getSize();
+                    g.setFont(g.getFont().deriveFont((float) (g.getFont().getSize() / 1.5)));
                     FontMetrics fm2 = g.getFontMetrics();
-                    while (str.charAt(c) != '^') {
-                        g.drawString(Character.toString(str.charAt(c)), x, y + (fm2.getAscent() + fm2.getLeading()));
-                        x += fm.stringWidth(Character.toString(str.charAt(c)));
+                    while (str.charAt(++c) != '^') {
+                        g.drawString(Character.toString(str.charAt(c)), x, y + (fm.getAscent() + fm.getLeading()));
+                        x += fm2.stringWidth(Character.toString(str.charAt(c)));
                     }
+                    g.setFont(g.getFont().deriveFont(size));
                     continue;
                 } else if (ch == '[' && nx == '^') {
                     // Footnote
-                    g.setFont(g.getFont().deriveFont(g.getFont().getSize() / 2));
+                    float size = g.getFont().getSize();
+                    g.setFont(g.getFont().deriveFont((float) (g.getFont().getSize() / 1.5)));
                     FontMetrics fm2 = g.getFontMetrics();
                     do {
-                        if (str.charAt(c) == '^')
+                        if (str.charAt(c) == '^' || str.charAt(c) == '[')
                             continue;
-                        g.drawString(Character.toString(str.charAt(c)), x, y + (fm2.getAscent() + fm2.getLeading()));
-                        x += fm.stringWidth(Character.toString(str.charAt(c)));
-                    } while (str.charAt(c) != ']');
+                        g.drawString(Character.toString(str.charAt(c)), x, y + (fm.getAscent() + fm.getLeading()));
+                        x += fm2.stringWidth(Character.toString(str.charAt(c)));
+                    } while (str.charAt(++c) != ']');
+                    g.setFont(g.getFont().deriveFont(size));
                     continue;
                 } else if (ch == '[') {
                     // Link open
@@ -242,7 +247,7 @@ public abstract class Syntax {
         public void render(Graphics g, int y) {
             g.setColor(color);
             g.setFont(font);
-            renderText(new Rectangle(0, y, dimension.width, dimension.height), g, text);
+            renderText(new Rectangle(0, y, Syntax.width, dimension.height), g, text);
         }
 
         public static boolean check(String lines) {
@@ -312,7 +317,7 @@ public abstract class Syntax {
         public void render(Graphics g, int y) {
             g.setColor(color);
             g.setFont(Syntax.font.deriveFont((float) (Syntax.font.getSize() * (1.0 + level / 5.0))));
-            renderText(new Rectangle(0, y, dimension.width, dimension.height), g, text);
+            renderText(new Rectangle(0, y, Syntax.width, dimension.height), g, text);
         }
         
         public static boolean check(String lines) {
@@ -335,7 +340,7 @@ public abstract class Syntax {
             String list = "";
             for (String item : items)
                 list += item + "\n";
-            return rawText(new Rectangle(point.x, point.y, Syntax.width - 16, -1), Syntax.font, list.strip());
+            return rawText(new Rectangle(point.x, point.y, Syntax.width - 20, -1), Syntax.font, list.strip());
         }
 
         public void render(Graphics g, int y) {
@@ -379,9 +384,9 @@ public abstract class Syntax {
                 g.setFont(font);
                 int c = 0;
                 for (String item : items) {
-                    String iden = ++c + ". ";
-                    g.drawString(iden, 16 - g.getFontMetrics().stringWidth(iden), y);
-                    y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, item.substring(item.indexOf('\s')));
+                    String iden = " %d. ".formatted(++c);
+                    g.drawString(iden, 20 - g.getFontMetrics().stringWidth(iden), y + g.getFontMetrics().getHeight());
+                    y += renderText(new Rectangle(20, y, Syntax.width - 20, -1), g, item.substring(item.indexOf('.') + 1).strip());
                 }
             }
         }
@@ -417,9 +422,9 @@ public abstract class Syntax {
                 g.setColor(color);
                 g.setFont(font);
                 for (String item : items) {
-                    int rad = 3;
-                    g.fillOval(16 - rad, (g.getFontMetrics().getHeight() - rad) / 2, rad, rad);
-                    y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, item);
+                    int rad = 6;
+                    g.fillOval((20 - rad) / 2, y + g.getFontMetrics().getHeight() - (g.getFontMetrics().getHeight() - rad) / 2, rad, rad);
+                    y += renderText(new Rectangle(20, y, Syntax.width - 20, -1), g, item);
                 }
             }
         }
@@ -433,7 +438,7 @@ public abstract class Syntax {
      * A quote paragraph induced by a greater-than-sign
      */
     public static class Quote extends Syntax {
-        public static final Pattern pattern = Pattern.compile("^>\\s?(.+(?:(?:>\\s)?.+?\\n)*)");
+        public static final Pattern pattern = Pattern.compile("^>\\s?(.+\\n(?:(?:>\\s?)?.+\\n)*)");
         private String[] text;
 
         public Quote(String markdown, Point point) {
@@ -447,7 +452,7 @@ public abstract class Syntax {
             String quote = "";
             for (String line : text)
                 quote += line + "\n";
-            return rawText(new Rectangle(point.x, point.y, Syntax.width - 16, -1), Syntax.font, quote.strip());
+            return rawText(new Rectangle(point.x, point.y, Syntax.width - 12, -1), Syntax.font, quote.strip());
         }
 
         public void render(Graphics g, int y) {
@@ -456,8 +461,8 @@ public abstract class Syntax {
             String total = "";
             for (String line : text)
                 total += line + "\n";
-            int h = renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, total.strip());
-            g.fillRect(0, y, 2, h);
+            int h = renderText(new Rectangle(12, y, Syntax.width - 12, -1), g, total.strip());
+            g.fillRect(0, y + g.getFontMetrics().getDescent(), 2, h);
         }
         
         public static boolean check(String lines) {
@@ -476,12 +481,12 @@ public abstract class Syntax {
         }
 
         private Dimension simulate(Point point) {
-            return new Dimension(Syntax.width, 4);
+            return new Dimension(Syntax.width, 2);
         }
 
         public void render(Graphics g, int y) {
             g.setColor(color);
-            g.fillRect(0, y, Syntax.width, 4);
+            g.fillRect(0, y, Syntax.width, 2);
         }
 
         public static boolean check(String lines) {
@@ -516,8 +521,9 @@ public abstract class Syntax {
                 String[] row = column[i].split("\\|");
                 int k = 0;
                 for (int j = 0; j < row.length; j++) {
-                    if (row[j].strip().length() > 0 && k < this.rows)
+                    if (row[j].strip().length() > 0 && k < this.rows) {
                         this.table[i][k++] = row[j].strip();
+                    }
                 }
             }
             this.fieldY = new int[this.columns];
@@ -526,42 +532,42 @@ public abstract class Syntax {
         }
 
         private Dimension simulate(Point point) {
-            int width = (Syntax.width / rows) - (rows * 7 + 1), height = 0;
-            int dy = 0;
-            for (String[] column : table) {
-                int max = 0;
-                int left = 4;
-                int dx = 0;
-                for (String row : column) {
-                    Dimension field = rawText(new Rectangle(point.x + left, point.y + height, width, -1), Syntax.font, row);
-                    left += 7 + field.width;
-                    if (max < field.height)
-                        max = field.height;
-                    if (field.width > fieldX[dx])
-                        fieldX[dx] = field.width;
-                    dx++;
+            int width = (Syntax.width / rows) - (rows * 7 + 1), height;
+            for (int col = 0; col < this.table.length; col++) {
+                for (int row = 0; row < this.table[col].length; row++) {
+                    Dimension d = rawText(new Rectangle(width * (col + 7) + 1, point.y, width, -1), col == 0 ? Syntax.font.deriveFont(Font.BOLD) : Syntax.font, this.table[col][row]);
+                    if (d.width > fieldX[row])
+                        fieldX[row] = d.width;
+                    if (d.height > fieldY[col])
+                        fieldY[col] = d.height;
                 }
-                height += max + 5;
-                fieldY[dy++] = max;
             }
-            return new Dimension(Syntax.width, height);
+            width = 1;
+            height = 1;
+            for (int x = 0; x < fieldX.length; x++)
+                width += fieldX[x] + 7;
+            for (int y = 0; y < fieldY.length; y++)
+                height += fieldY[y] + 7;
+            return new Dimension(width, height);
         }
 
         public void render(Graphics g, int y) {
-            g.setColor(color);
-            g.setFont(font);
-            g.drawLine(0, y, Syntax.width, y);
-            for (int c = 0; c < columns; c++) {
-                int x = 3;
-                g.drawLine(0, y, 0, y + fieldY[c] + 3);
-                for (int r = 0; r < rows; r++) {
-                    renderText(new Rectangle(x, y, fieldX[r], fieldY[c]), g, table[c][r]);
-                    g.drawLine(x + 3, y, x + 3, y + fieldY[c] + 3);
-                    x += fieldX[r] + 7;
+            int x;
+            for (int col = 0; col < this.table.length; col++) {
+                x = 4;
+                if (col == 0)
+                    g.setFont(font.deriveFont(Font.BOLD));
+                else
+                    g.setFont(font);
+                for (int row = 0; row < this.table[col].length; row++) {
+                    renderText(new Rectangle(x, y - g.getFontMetrics().getDescent(), fieldX[row], fieldY[col]), g, this.table[col][row]);
+                    x += fieldX[row] + 7;
                 }
-                y += fieldY[c];
-                g.drawLine(0, y, Syntax.width, y);
+                g.setColor(Color.LIGHT_GRAY.brighter());
+                g.drawLine(0, y - 3, dimension.width, y - 3);
+                y += fieldY[col] + 7;
             }
+            g.drawLine(0, y - 3, dimension.width, y - 3);
         }
         
         public static boolean check(String lines) {
@@ -599,9 +605,10 @@ public abstract class Syntax {
             g.setFont(font);
             y += renderText(new Rectangle(0, y, Syntax.width, -1), g, term);
             g.setFont(font.deriveFont(Font.ITALIC));
-            for (String def : definition) {
-                y += renderText(new Rectangle(16, y, Syntax.width-16, -1), g, def);
-            }
+            String quote = "";
+            for (String line : definition)
+                quote += "\n" + line;
+            y += renderText(new Rectangle(16, y, Syntax.width - 16, -1), g, quote.strip());
         }
         
         public static boolean check(String lines) {
@@ -621,10 +628,10 @@ public abstract class Syntax {
             m.find();
             if (m.groupCount() == 1) {
                 language = null;
-                code = m.group(1);
+                code = m.group(1).strip();
             } else {
                 language = m.group(1);
-                code = m.group(2);
+                code = m.group(2).strip();
             }
             this.dimension = new Rectangle(point, simulate(point));
         }
@@ -659,7 +666,7 @@ public abstract class Syntax {
                     x = 0;
                     y += g.getFontMetrics().getHeight();
                 }
-                g.drawString(Character.toString(c), x, y);
+                g.drawString(Character.toString(c), x, y + g.getFontMetrics().getHeight());
                 x += g.getFontMetrics().stringWidth(Character.toString(c));
             }
         }
