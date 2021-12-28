@@ -2,6 +2,7 @@ package src.gpc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.LinkedList;
@@ -217,8 +218,14 @@ public class Markdown extends Panel {
      * 
      * @return a hashmap with links and their actionbox rectangles in the canvas
      */
-    public HashMap<String, Rectangle> getLinks() {
-        return new HashMap<String, Rectangle>();
+    public HashMap<URL, Rectangle> getLinks() {
+        HashMap<URL, Rectangle> map = new HashMap<URL, Rectangle>();
+        Syntax.Link[] array = Syntax.getLinks();
+        for (Syntax.Link link : array) {
+            Rectangle box = link.getActionBox();
+            map.put(link.getURL(), new Rectangle(box.x, box.y - scroll, box.width, box.height));
+        }
+        return map;
     }
 
 }

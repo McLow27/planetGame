@@ -84,11 +84,11 @@ public class Info extends GUI implements Start {
     }
 
     public void mousePressed(MouseEvent e) {
-        HashMap<String, Rectangle> links = md.getLinks();
+        HashMap<URL, Rectangle> links = md.getLinks();
         int x = (Window.WIDTH - md.getWidth())/2, y = (Window.HEIGHT - md.getHeight())/2;
         if ((e.getX() > x && e.getX() < x + md.getWidth()) && (e.getY() > y && e.getY() < y + md.getHeight())) {
             int mx = e.getX() - x, my = e.getY() - y;
-            for (String link : links.keySet()) {
+            for (URL link : links.keySet()) {
                 Rectangle r = links.get(link);
                 if (mx < r.getX() || mx > r.getX() + r.getWidth())
                     continue;
@@ -97,7 +97,7 @@ public class Info extends GUI implements Start {
                 Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
                 if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
                     try {
-                        desktop.browse(new URL(link).toURI());
+                        desktop.browse(link.toURI());
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

@@ -34,7 +34,6 @@ public abstract class Syntax {
     protected Rectangle dimension;
 
     private static LinkedList<Link> links = new LinkedList<Link>();
-    private static LinkedList<Footnote> footnotes = new LinkedList<Footnote>();
 
     /**
      * Checks whether the markdown matches the pattern
@@ -73,15 +72,26 @@ public abstract class Syntax {
                 escflag = true;
                 continue;
             }
+            boolean skip = false;
             for (char[] special : formatting) {
-                if (special[0] == str.charAt(c) && (special[1] != '\0' && c < str.length() - 1 ? (special[1] == str.charAt(c+1)) : true))
-                    continue;
+                if (special[0] == str.charAt(c)) {
+                    if (special[1] == '\0') {
+                        skip = true;
+                        break;
+                    } else if (c < str.length() - 1 && special[1] == str.charAt(c+1)) {
+                        c++;
+                        skip = true;
+                        break;
+                    }
+                }
             }
+            if (skip)
+                continue;
             if (Link.check(str.substring(c))) {
                 Matcher m = Link.pattern.matcher(str.substring(c));
                 m.find();
                 String al = m.group(1), be = m.group(2), ga = m.groupCount() == 3 ? m.group(3) : null;
-                links.add(new Link(be, new Rectangle(fm.stringWidth(line) + box.width, height + box.height, fm.stringWidth(al), fm.getHeight()), ga));
+                links.add(new Link(be, new Rectangle(fm.stringWidth(line) + box.x, height + box.y, fm.stringWidth(al), fm.getHeight()), ga));
                 line += al;
                 c += m.group(0).length() - 1;
                 continue;
@@ -291,6 +301,10 @@ public abstract class Syntax {
 
         public static boolean check(String lines) {
             return pattern.matcher(lines).find();
+        }
+
+        public String getHoverString() {
+            return hover;
         }
     }
 
@@ -674,6 +688,10 @@ public abstract class Syntax {
         public static boolean check(String lines) {
             return pattern.matcher(lines).find();
         }
+
+        public String getLanguage() {
+            return language;
+        }
     }
     
     /**
@@ -681,19 +699,12 @@ public abstract class Syntax {
      */
     public static class Footnote extends Syntax {
         public static final Pattern pattern = Pattern.compile("^\\[\\^(\\d+|\\w+)\\]:\\s?(.*)\\n?$");
-        private int num;
         private String note, identifier = null;
 
         public Footnote(String markdown, Point point) {
             Matcher m = pattern.matcher(markdown);
             m.find();
-            try {
-                identifier = m.group(1);
-                num = Integer.parseInt(m.group(1));
-            } catch (Exception e) {
-                identifier = m.group(1);
-                num = footnotes.size();
-            }
+            identifier = m.group(1);
             this.note = m.group(2);
             this.dimension = new Rectangle(point, simulate(point));
         }
@@ -737,6 +748,18 @@ public abstract class Syntax {
             }
             this.box = box;
             this.hover = hover;
+        }
+
+        public URL getURL() {
+            return url;
+        }
+
+        public Rectangle getActionBox() {
+            return box;
+        }
+
+        public String getHoverString() {
+            return hover;
         }
 
         /**
@@ -806,6 +829,13 @@ public abstract class Syntax {
             extend.add(type.asSubclass(Syntax.class));
         }
         return extend;
+    }
+
+    public static Link[] getLinks() {
+        Link[] array = new Link[links.size()];
+        for (int i = 0; i < links.size(); i++)
+            array[i] = links.get(i);
+        return array;
     }
 
 }
