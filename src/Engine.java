@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.MouseInfo;
-import src.gui.Background;
 import src.gui.Explorer;
 import src.gui.Handler;
 import src.gui.Info;
@@ -105,7 +104,7 @@ public class Engine extends Canvas implements Runnable {
      */
     public Engine() {
         state = new UI();
-        setState(UI.State.CREDITS);
+        setState(UI.State.TITLE);
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
         MouseInput mi = new MouseInput(state);
@@ -189,7 +188,7 @@ public class Engine extends Canvas implements Runnable {
                 this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.TUTORIAL), state);
                 break;
             case CREDITS:
-                this.state.setState(new Info(new Background(), Info.Tab.CREDITS), state);
+                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.CREDITS), state);
                 break;
             case SETTINGS:
                 this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.SETTINGS), state);

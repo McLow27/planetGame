@@ -838,4 +838,24 @@ public abstract class Syntax {
         return array;
     }
 
+    public static URL[] getImages(String[] lines) {
+        LinkedList<URL> images = new LinkedList<URL>();
+        for (String line : lines) {
+            if (MarkdownImage.check(line)) {
+                try {
+                    Matcher m = MarkdownImage.pattern.matcher(line);
+                    m.find();
+                    URL url = new URL(m.group(1));
+                    images.add(url);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        URL[] urls = new URL[images.size()];
+        for (int i = 0; i < images.size(); i++)
+            urls[i] = images.get(i);
+        return urls;
+    }
+
 }

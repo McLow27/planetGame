@@ -13,11 +13,14 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import src.Engine;
 import src.GUI;
 import src.Window;
 import src.gpc.Markdown;
+import src.gpc.Syntax;
+import src.gpc.LoadingBar;
 
 public class Info extends GUI implements Start {
 
@@ -30,6 +33,7 @@ public class Info extends GUI implements Start {
     private Background wallpaper;
     private Tab info;
     private Markdown md;
+    private LoadingBar load;
     private BufferedImage[] pfps;
 
     public Info(Background wallpaper, Tab info) {
@@ -39,10 +43,10 @@ public class Info extends GUI implements Start {
             this.font = Font.createFont(Font.PLAIN, new File(path + "\\rsc\\fonts\\NexaHeavy.ttf"));
             switch(this.info) {
                 case TUTORIAL:
-                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\tutorial.md"));
+                    loadMarkdown(new File(path + "\\rsc\\tutorial.md"));
                     break;
                 case CREDITS:
-                    this.md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), new File(path + "\\rsc\\credits.md"));
+                    loadMarkdown(new File(path + "\\rsc\\credits.md"));
                     pfps = new BufferedImage[4];
                     for (int i = 1; i <= 4; i++)
                         pfps[i-1] = ImageIO.read(new File(path + "\\rsc\\pfp" + i + ".png"));
@@ -53,6 +57,24 @@ public class Info extends GUI implements Start {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void loadMarkdown(File file) throws FileNotFoundException {
+        this.md = null;
+        Thread load = new Thread() {
+            public void run() {
+                try {
+                    URL[] imgs = Markdown.getImages(file);
+                    if (imgs.length > 0) {
+                        
+                    }
+                    md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), file);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        load.start();
     }
 
     public void render(Graphics g) {

@@ -19,7 +19,7 @@ public class Markdown extends Panel {
     private boolean fadein = true;
     private int scroll = 0;
 
-    private String[] split(String str, char rgx) {
+    private static String[] split(String str, char rgx) {
         LinkedList<String> list = new LinkedList<String>();
         String buffer = "";
         for (char c : str.toCharArray()) {
@@ -54,6 +54,20 @@ public class Markdown extends Panel {
         };
         scan.close();
         this.markdown = Syntax.compile(this.split(md, '\n'));
+    }
+
+    public static URL[] getImages(String markdown) {
+        return Syntax.getImages(split(markdown, '\n'));
+    }
+
+    public static URL[] getImages(File markdown) throws FileNotFoundException {
+        Scanner scan = new Scanner(markdown);
+        String md = "";
+        while (scan.hasNext()) {
+            md += scan.nextLine() + "\n";
+        };
+        scan.close();
+        return Syntax.getImages(split(md, '\n'));
     }
 
     public BufferedImage render() {
