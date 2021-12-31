@@ -40,7 +40,7 @@ public class Markdown extends Panel {
         super(dimension);
         Syntax.font = font;
         Syntax.width = dimension.width;
-        this.markdown = Syntax.compile(this.split(markdown, '\n'));
+        this.markdown = Syntax.compile(Markdown.split(markdown, '\n'));
     }
 
     public Markdown(Dimension dimension, Font font, File markdown) throws FileNotFoundException {
@@ -53,21 +53,7 @@ public class Markdown extends Panel {
             md += scan.nextLine() + "\n";
         };
         scan.close();
-        this.markdown = Syntax.compile(this.split(md, '\n'));
-    }
-
-    public static URL[] getImages(String markdown) {
-        return Syntax.getImages(split(markdown, '\n'));
-    }
-
-    public static URL[] getImages(File markdown) throws FileNotFoundException {
-        Scanner scan = new Scanner(markdown);
-        String md = "";
-        while (scan.hasNext()) {
-            md += scan.nextLine() + "\n";
-        };
-        scan.close();
-        return Syntax.getImages(split(md, '\n'));
+        this.markdown = Syntax.compile(Markdown.split(md, '\n'));
     }
 
     public BufferedImage render() {

@@ -8,7 +8,7 @@ import java.io.File;
 import src.Engine;
 import src.GUI;
 import src.Window;
-import src.gpc.LoadingBar;
+import src.gpc.ProgressBar;
 import src.gpc.Panel;
 
 public class Explorer extends GUI implements Start {
@@ -19,7 +19,7 @@ public class Explorer extends GUI implements Start {
     public Explorer(Background wallpaper) {
         this.wallpaper = wallpaper;
         try {
-            this.panel = new LoadingBar(new Dimension(600, 60), 60 * 8, Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f));
+            this.panel = new ProgressBar(new Dimension(600, 60), Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f), 60 * 8);
         } catch (Exception e) {
             e.printStackTrace();
         }

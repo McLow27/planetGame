@@ -10,16 +10,17 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.FontFormatException;
 import java.util.HashMap;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
 import src.Engine;
 import src.GUI;
 import src.Window;
 import src.gpc.Markdown;
-import src.gpc.Syntax;
 import src.gpc.LoadingBar;
 
 public class Info extends GUI implements Start {
@@ -59,16 +60,14 @@ public class Info extends GUI implements Start {
         }
     }
 
-    public void loadMarkdown(File file) throws FileNotFoundException {
+    public void loadMarkdown(File file) throws FileNotFoundException, FontFormatException, IOException {
         this.md = null;
+        this.load = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f));
         Thread load = new Thread() {
             public void run() {
                 try {
-                    URL[] imgs = Markdown.getImages(file);
-                    if (imgs.length > 0) {
-                        
-                    }
-                    md = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), file);
+                    Markdown compiled = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), file);
+                    md = compiled;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
