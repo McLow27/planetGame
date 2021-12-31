@@ -8,7 +8,7 @@ import java.io.File;
 import src.Engine;
 import src.GUI;
 import src.Window;
-import src.gpc.ProgressBar;
+import src.gpc.LoadingBar;
 import src.gpc.Panel;
 
 public class Explorer extends GUI implements Start {
@@ -19,7 +19,10 @@ public class Explorer extends GUI implements Start {
     public Explorer(Background wallpaper) {
         this.wallpaper = wallpaper;
         try {
-            this.panel = new ProgressBar(new Dimension(600, 60), Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f), 60 * 8);
+            this.panel = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN,
+            new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f),
+            60 * 8, "Gathering lobbies...");
+            ((LoadingBar) this.panel).finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -31,12 +34,14 @@ public class Explorer extends GUI implements Start {
 
     public void simRender(Graphics g, double d) {
         this.wallpaper.simRender(g, d);
-        g.drawImage(this.panel.simRender(d), (Window.WIDTH - this.panel.getWidth()) / 2, (Window.HEIGHT - this.panel.getHeight()) / 2, null);
+        if (this.panel != null && (this.panel instanceof LoadingBar ? !((LoadingBar) this.panel).finished() : true))
+            g.drawImage(this.panel.simRender(d), (Window.WIDTH - this.panel.getWidth()) / 2, (Window.HEIGHT - this.panel.getHeight()) / 2, null);
     }
 
     public void tick() {
         this.wallpaper.tick();
-        this.panel.tick();
+        if (this.panel != null && (this.panel instanceof LoadingBar && !((LoadingBar) this.panel).finished()))
+            this.panel.tick();
     }
 
     public Background getWallpaper() {

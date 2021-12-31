@@ -62,18 +62,21 @@ public class Info extends GUI implements Start {
 
     public void loadMarkdown(File file) throws FileNotFoundException, FontFormatException, IOException {
         this.md = null;
-        this.load = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN, new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f));
-        Thread load = new Thread() {
+        this.load = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN,
+        new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f),
+        (int) (2.5 * 60));
+        Thread secondary = new Thread() {
             public void run() {
                 try {
                     Markdown compiled = new Markdown(new Dimension(Window.WIDTH/2, Window.HEIGHT-40), font.deriveFont(16f), file);
                     md = compiled;
+                    load.finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         };
-        load.start();
+        secondary.start();
     }
 
     public void render(Graphics g) {
@@ -82,22 +85,26 @@ public class Info extends GUI implements Start {
 
     public void simRender(Graphics g, double d) {
         this.wallpaper.simRender(g, d);
-        if (md != null) {
+        if (load != null && !load.finished()) {
+            g.drawImage(load.simRender(d), (Window.WIDTH - load.getWidth())/2, (Window.HEIGHT - load.getHeight())/2, null);
+        } else if (md != null) {
             BufferedImage rend = md.render();
             g.drawImage(rend, (Window.WIDTH - rend.getWidth())/2, (Window.HEIGHT - rend.getHeight())/2, null);
-        }
-        if (info == Tab.CREDITS) {
-            for (int i = 0; i < pfps.length; i++) {
-                Dimension m = new Dimension(Window.WIDTH/4, Window.HEIGHT/2);
-                Point p = new Point(i / 2 == 0 ? 0 : m.width * 3, i % 2 * m.height);
-                int s = m.height / 2;
-                g.drawImage(pfps[i], p.x + (m.width - s) / 2, p.y + (m.height - s) / 2, s, s, null);
+            if (info == Tab.CREDITS) {
+                for (int i = 0; i < pfps.length; i++) {
+                    Dimension m = new Dimension(Window.WIDTH/4, Window.HEIGHT/2);
+                    Point p = new Point(i / 2 == 0 ? 0 : m.width * 3, i % 2 * m.height);
+                    int s = m.height / 2;
+                    g.drawImage(pfps[i], p.x + (m.width - s) / 2, p.y + (m.height - s) / 2, s, s, null);
+                }
             }
         }
     }
 
     public void tick() {
         this.wallpaper.tick();
+        if (load != null && !load.finished())
+            load.tick();
     }
     
     public Background getWallpaper() {
@@ -118,6 +125,7 @@ public class Info extends GUI implements Start {
     }
 
     public void mousePressed(MouseEvent e) {
+        if (md == null) return;
         HashMap<URL, Rectangle> links = md.getLinks();
         int x = (Window.WIDTH - md.getWidth())/2, y = (Window.HEIGHT - md.getHeight())/2;
         if ((e.getX() > x && e.getX() < x + md.getWidth()) && (e.getY() > y && e.getY() < y + md.getHeight())) {
