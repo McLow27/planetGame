@@ -1,5 +1,18 @@
 package src.utl;
 
+/**
+ * Generic classes storing between two and five objects of different types.
+ * The benefits of using those are:
+ * <p><ul>
+ * <li>storing multiple objects of different types in one object</li>
+ * <li>multiple parameters or return values especially in {@link Lambda} functions</li>
+ * <li>no conversions necessary as with {@code java.lang.Object[]}</li>
+ * </ul></p>
+ * Python already supports these and perhaps Java will, too, someday.
+ * 
+ * @author TheCommandBlock
+ * @since 25/12/2021
+ */
 public class Tuple {
 
     public final static class Pair<A, B> extends Tuple {

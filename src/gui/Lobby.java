@@ -6,6 +6,12 @@ import src.srv.ServerInterface;
 import src.GUI;
 import src.Engine;
 
+/**
+ * A GUI that will be shown inside a lobby.
+ * 
+ * @author TheCommandBlock
+ * @since 03/12/2021
+ */
 public class Lobby extends GUI implements Start {
 
     private Background wallpaper;
@@ -16,14 +22,17 @@ public class Lobby extends GUI implements Start {
         this.player = player;
     }
 
+    @Override
     public void render(Graphics g) {
-        simRender(g, 0.0);
+        render(g, 0.0);
     }
 
-    public void simRender(Graphics g, double d) {
-        this.wallpaper.simRender(g, d);
+    @Override
+    public void render(Graphics g, double d) {
+        this.wallpaper.render(g, d);
     }
 
+    @Override
     public void tick() {
         this.wallpaper.tick();
         // XXX Just to get the "unused" warning to disappear
@@ -34,6 +43,7 @@ public class Lobby extends GUI implements Start {
         return wallpaper;
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
             Engine.getEngine().setState(Engine.UI.State.TITLE);

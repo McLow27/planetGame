@@ -11,6 +11,12 @@ import src.Window;
 import src.gpc.LoadingBar;
 import src.gpc.Panel;
 
+/**
+ * An explorer to find open lobbies.
+ * 
+ * @author TheCommandBlock
+ * @since 03/12/2021
+ */
 public class Explorer extends GUI implements Start {
 
     private Background wallpaper;
@@ -28,16 +34,19 @@ public class Explorer extends GUI implements Start {
         }
     }
 
+    @Override
     public void render(Graphics g) {
-        simRender(g, 0.0);
+        render(g, 0.0);
     }
 
-    public void simRender(Graphics g, double d) {
-        this.wallpaper.simRender(g, d);
+    @Override
+    public void render(Graphics g, double d) {
+        this.wallpaper.render(g, d);
         if (this.panel != null && (this.panel instanceof LoadingBar ? !((LoadingBar) this.panel).finished() : true))
-            g.drawImage(this.panel.simRender(d), (Window.WIDTH - this.panel.getWidth()) / 2, (Window.HEIGHT - this.panel.getHeight()) / 2, null);
+            g.drawImage(this.panel.render(d), (Window.WIDTH - this.panel.getWidth()) / 2, (Window.HEIGHT - this.panel.getHeight()) / 2, null);
     }
 
+    @Override
     public void tick() {
         this.wallpaper.tick();
         if (this.panel != null && (this.panel instanceof LoadingBar && !((LoadingBar) this.panel).finished()))
@@ -48,6 +57,7 @@ public class Explorer extends GUI implements Start {
         return wallpaper;
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
             Engine.getEngine().setState(Engine.UI.State.TITLE);

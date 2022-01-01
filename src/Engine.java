@@ -15,16 +15,34 @@ import src.gui.Start;
 import src.gui.Title;
 
 /**
- * A game engine extending the Canvas class; runs a tick/render engine in a
- * separate thread with a constant TPS of 20 and varying peak FPS rendering the
- * game onto the canvas that is itself
+ * A game engine extending the {@link java.awt.Canvas} class; runs a tick/render engine in a
+ * separate {@link java.lang.Thread} with a constant TPS of 20 and varying peak FPS rendering 
+ * the game onto this {@code Canvas}.
+ * 
+ * @author TheCommandBlock
+ * @since 12/12/2021
  */
 public class Engine extends Canvas implements Runnable {
 
+    /**
+     * The dimensions of the game canvas
+     */
     public static final int WIDTH = 1280, HEIGHT = WIDTH / 16 * 9;
+    /**
+     * The title of the window
+     */
     public static final String TITLE = "Working Title";
+    /**
+     * The game engine object but static so it can be used from other classes
+     */
     private static Engine game;
+    /**
+     * The secondary thread this game engine runs on
+     */
     private Thread thread;
+    /**
+     * Whether the thread and the game engine are still running
+     */
     private boolean running = false;
 
     /**
@@ -97,14 +115,19 @@ public class Engine extends Canvas implements Runnable {
         }
     }
 
+    /**
+     * The current state of the user interface; what is being shown right now
+     */
     private UI state;
 
     /**
-     * A new game engine object; a new instance of the game
+     * A new game engine object; a new instance of the game.
      */
     public Engine() {
+        // Show the title screen
         state = new UI();
         setState(UI.State.TITLE);
+        // Create a new window with this canvas and add listeners
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
         MouseInput mi = new MouseInput(state);
@@ -147,14 +170,18 @@ public class Engine extends Canvas implements Runnable {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
+            // Tick at the constant TPS as specified above
             while (delta >= 1) {
                 tick();
                 delta--;
             }
-            if (running)
+            // Render at the maximum FPS
+            if (running && delta >= 1)
                 render();
+            else if (running)
+                render(delta);
             frames++;
-
+            // Print out the current FPS every second
             if (System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
                 System.out.println("FPS: " + frames);
@@ -211,9 +238,16 @@ public class Engine extends Canvas implements Runnable {
         return state.getState();
     }
 
+    /**
+     * Returns the current position of the mouse relative to this canvas
+     * 
+     * @return a {@link java.awt.Point} object of the mouse position or null if the mouse is outside the window 
+     */
     public static Point getMousePoint() {
         Point mouse = MouseInfo.getPointerInfo().getLocation();
         SwingUtilities.convertPointFromScreen(mouse, game);
+        if ((mouse.getX() < 0 || mouse.getX() > Engine.WIDTH) || (mouse.getY() < 0 || mouse.getY() > Engine.HEIGHT))
+            return null;
         return mouse;
     }
 
@@ -254,7 +288,31 @@ public class Engine extends Canvas implements Runnable {
         bs.show();
     }
 
+    /**
+     * Creates new {@link java.awt.Graphics} for this {@link java.awt.Canvas}, 
+     * renders the currently displayed {@code GUI} but with intermediate renders that 
+     * simulate the behaviour of objects on the screen for a smoother animation 
+     * beyond the constant TPS, then displays the {@link java.awt.image.BufferStrategy}
+     */
+    public void render(double d) {
+        BufferStrategy bs = this.getBufferStrategy();
+        if (bs == null) {
+            this.createBufferStrategy(3);
+            return;
+        }
+        Graphics g = bs.getDrawGraphics();
+
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, WIDTH, HEIGHT);
+
+        state.getUI().render(g, d);
+
+        g.dispose();
+        bs.show();
+    }
+
     public static void main(String[] args) {
+        // Start the game engine; the rest will be taken care of by the constructor
         Engine.game = new Engine();
     }
 

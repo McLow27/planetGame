@@ -13,12 +13,35 @@ import java.awt.Rectangle;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+/**
+ * A class for reading and displaying Markdown
+ * 
+ * @author TheCommandBlock
+ * @since 21/12/2021
+ */
 public class Markdown extends Panel {
 
+    /**
+     * The markdown elements
+     */
     private Syntax[] markdown;
+    /**
+     * Whether there should be a fade animation when scrolling
+     */
+    // TODO maybe add this
     private boolean fadein = true;
+    /**
+     * An unsigned integer defining how far one has scrolled
+     */
     private int scroll = 0;
 
+    /**
+     * Splits a string of text by a given char but including empty strings.
+     * 
+     * @param str the string to split
+     * @param rgx the character by which to split
+     * @return an array of strings
+     */
     private static String[] split(String str, char rgx) {
         LinkedList<String> list = new LinkedList<String>();
         String buffer = "";
@@ -36,6 +59,13 @@ public class Markdown extends Panel {
         return result;
     }
 
+    /**
+     * Compiles a markdown from a string
+     * 
+     * @param dimension the dimensions of the rendered image
+     * @param font      the font of the markdown
+     * @param markdown  the markdown string itself
+     */
     public Markdown(Dimension dimension, Font font, String markdown) {
         super(dimension);
         Syntax.font = font;
@@ -43,6 +73,14 @@ public class Markdown extends Panel {
         this.markdown = Syntax.compile(Markdown.split(markdown, '\n'));
     }
 
+    /**
+     * Compiles a markdown from a file
+     * 
+     * @param dimension the dimensions of the rendered image
+     * @param font      the font of the markdown
+     * @param markdown  the markdown file
+     * @throws FileNotFoundException if the file could not be found by the {@link java.util.Scanner}
+     */
     public Markdown(Dimension dimension, Font font, File markdown) throws FileNotFoundException {
         super(dimension);
         Syntax.font = font;
@@ -56,14 +94,8 @@ public class Markdown extends Panel {
         this.markdown = Syntax.compile(Markdown.split(md, '\n'));
     }
 
+    @Override
     public BufferedImage render() {
-        return simRender(0.0);
-    }
-
-    /**
-     * No longer bodged markdown formatting and render method
-     */
-    public BufferedImage simRender(double delta) {
         BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.createGraphics();
         int y = -scroll;
@@ -226,9 +258,9 @@ public class Markdown extends Panel {
     }
 
     /**
-     * Get the coordinates of sections with a link
+     * Get the coordinates of sections with a {@code [link]}({@link Syntax.Link})
      * 
-     * @return a hashmap with links and their actionbox rectangles in the canvas
+     * @return a hashmap with {@link Syntax.Link}'s and their actionbox {@link java.awt.Rectangle}'s in the {@link java.awt.Canvas}
      */
     public HashMap<URL, Rectangle> getLinks() {
         HashMap<URL, Rectangle> map = new HashMap<URL, Rectangle>();

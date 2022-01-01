@@ -19,12 +19,53 @@ import java.util.regex.Matcher;
 import src.utl.Lambda.Yield;
 import src.utl.Tuple.Pair;
 
+/**
+ * A class for compiling and rendering markdown elements.
+ * Currently supported are:
+ * <p><ul>
+ * <li>Paragraph</li>
+ * <li>Image</li>
+ * <li>Paragraph</li>
+ * <li>Heading</li>
+ * <li>List<ul>
+ * <li>Ordered Lsit</li>
+ * <li>Unordered List</li>
+ * </ul></li>
+ * <li>Quote</li>
+ * <li>Horizontal Rule</li>
+ * <li>Table</li>
+ * <li>Definition</li>
+ * <li>Codeblock</li>
+ * <li>Footnote</li>
+ * <li>Link</li>
+ * </ul></p>
+ * 
+ * NOTE: This class is not perfect and might still have bugs but it works in production.
+ * 
+ * @author TheCommandBlock
+ * @since 24/12/2021
+ */
 public abstract class Syntax {
     
+    /**
+     * The font of the markdown
+     */
     public static Font font;
+    /**
+     * The vertical spacing between elements
+     */
     public static int spacing = 12;
+    /**
+     * The font color
+     */
     public static Color color = Color.WHITE;
+    /**
+     * Special colors for code sections, highlighted sections and links
+     */
     public static Color code = new Color(11, 255, 131), highlight = new Color(255, 254, 6), link = new Color(25, 254, 255);
+    /**
+     * The width of the whole markdown panel
+     */
     public static int width;
 
     public static final char[][] formatting = new char[][] {
@@ -223,7 +264,7 @@ public abstract class Syntax {
     /**
      * The height of the component
      * 
-     * @return
+     * @return the height of the markdown element
      */
     public int getHeight() {
         return dimension.height;
@@ -232,7 +273,7 @@ public abstract class Syntax {
     /**
      * The width of the component
      * 
-     * @return
+     * @return the width of the markdown element
      */
     public int getWidth() {
         return dimension.width;
@@ -773,6 +814,12 @@ public abstract class Syntax {
         }
     }
 
+    /**
+     * Compiles an array of lines into markdown elements.
+     * 
+     * @param markdown an array of strings with empty lines included
+     * @return an array of markdown elements
+     */
     public static Syntax[] compile(String[] markdown) {
         LinkedList<Syntax> syntax = new LinkedList<Syntax>();
 
@@ -823,6 +870,13 @@ public abstract class Syntax {
         return array;
     }
 
+    /**
+     * Converts an array of classes into an array of classes extending the {@link Syntax} class 
+     * by iterating the array and moving the whole unchecked conversion to a built-in function
+     * 
+     * @param array the array to convert
+     * @return the converted array
+     */
     private static final ArrayList<Class<? extends Syntax>> convert(Class<?>[] array) {
         ArrayList<Class<? extends Syntax>> extend = new ArrayList<Class<? extends Syntax>>();
         for (Class<?> type : array) {
@@ -831,6 +885,11 @@ public abstract class Syntax {
         return extend;
     }
 
+    /**
+     * Gets all links found in this markdown
+     * 
+     * @return an array of the {@link Syntax.Link} objects
+     */
     public static Link[] getLinks() {
         Link[] array = new Link[links.size()];
         for (int i = 0; i < links.size(); i++)
