@@ -10,15 +10,42 @@ import java.util.LinkedList;
 import src.GUI;
 import src.Window;
 
+/**
+ * An animated background with random Kurzgesagt-style satellites moving over the screen.
+ * 
+ * @author TheCommandBlock
+ * @since 14/12/2021
+ */
 public class Background extends GUI {
 
+    /**
+     * A class for the animated satellite objects on the background
+     */
     static class Satellite {
+        /**
+         * Nothing but a random number generator
+         */
         private static final Random random = new Random();
-        private double x, y, r;
+        /**
+         * The coordinates of the satellite
+         */
+        private double x, y;
+        /**
+         * The velocity of the satellite along the x-axis in pixels per tick
+         */
         private double velX;
+        /**
+         * The dimensions of the satellite
+         */
         private Dimension dimension;
+        /**
+         * The index of the {@link java.awt.image.BufferedImage} of the satellite in the array
+         */
         private int sat;
 
+        /**
+         * Creates a new satellite object and randomly sets all the attributes
+         */
         public Satellite() {
             this.velX = (random.nextInt(50) + 10) / 12.0;
             this.sat = random.nextInt(sats.length);
@@ -31,33 +58,59 @@ public class Background extends GUI {
             this.dimension = new Dimension((int) (width * s), (int) (height * s));
             this.x = -this.dimension.getWidth();
             this.y = random.nextInt(Window.HEIGHT);
-            this.r = random.nextInt(360);
         }
 
+        /**
+         * Gets the x-coordinate of the satellite
+         * 
+         * @return an integer between the negative width of this satellite 
+         * and the width of the screen
+         */
         public double getX() {
             return x;
         }
 
+        /**
+         * Gets the y-coordinate of the satellite
+         * 
+         * @return an integer between zero and the height of the screen
+         */
         public double getY() {
             return y;
         }
 
+        /**
+         * Gets the index of the image of the satellite in the array
+         * 
+         * @return an integer within the bounds of the array
+         */
         public int getSatellite() {
             return sat;
         }
 
-        public double getRotation() {
-            return r;
-        }
-
+        /**
+         * Gets the x-velocity of the satellite in pixels per tick
+         * 
+         * @return the x-velocity of the satellite somewhere between 1.2 and 5
+         */
         public double getXVelocity() {
             return velX;
         }
 
+        /**
+         * Gets the dimensions of the image of this satellite
+         * 
+         * @return a dimension object to which the image of this satellite should be cropped
+         */
         public Dimension getDimension() {
             return dimension;
         }
 
+        /**
+         * Updates the x-coordinate of this satellite
+         * 
+         * @param x the new x-coordinate
+         */
         public void setX(double x) {
             this.x = x;
         }
@@ -72,11 +125,11 @@ public class Background extends GUI {
      */
     private static BufferedImage[] sats;
     /**
-     * The path of this code, + "\\rsc" is the resource folder
+     * The path of this executable, + "\\rsc" is the resource folder
      */
     static final String path = System.getProperty("user.dir");
     /**
-     * A linked list containing all the asteroids and artificial satellites in the background
+     * A list containing all the asteroids and artificial satellites in the background
      */
     private LinkedList<Satellite> satellites;
     /**
@@ -84,6 +137,10 @@ public class Background extends GUI {
      */
     private BufferedImage wallpaper;
 
+    /**
+     * Creates a new background to use for the title screen, retrieves all resources 
+     * and randomly generates an army of satellites that float over the screen.
+     */
     public Background() {
         try {
             // Wallpaper
@@ -106,6 +163,7 @@ public class Background extends GUI {
         }
     }
 
+    @Override
     public void tick() {
         // Satellites
         if (random.nextInt(60) < 1)
@@ -118,11 +176,13 @@ public class Background extends GUI {
         }
     }
 
+    @Override
     public void render(Graphics g) {
-        simRender(g, 0.0);
+        render(g, 0.0);
     }
 
-    public void simRender(Graphics g, double d) {
+    @Override
+    public void render(Graphics g, double d) {
         // Wallpaper
         int w = wallpaper.getWidth(), h = wallpaper.getHeight();
         if (w / Window.WIDTH < h / Window.HEIGHT) {
@@ -135,7 +195,6 @@ public class Background extends GUI {
         g.drawImage(wallpaper, (Window.WIDTH - w) / 2, (Window.HEIGHT - h) / 2, w, h, null);
 
         // Satellites
-        // TODO find out how to rotate the satellite
         for (Satellite sat : satellites) {
             g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
                     (int) sat.getY(),

@@ -1,4 +1,4 @@
-package src.obj;
+package src.gpc;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -10,22 +10,54 @@ import java.awt.Rectangle;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Dimension;
 import java.util.Random;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 import src.Window;
+import src.utl.Tuple.Pair;
+import src.utl.Tuple.Triple;
 import src.GUI;
-import src.Tuple.Pair;
-import src.Tuple.Triple;
 
-public class Header {
+/**
+ * An animated header in Kurzgesagt-style with fancy build-up animation.
+ * 
+ * @author TheCommandBlock
+ * @since 15/12/2021
+ */
+public class Header extends Panel {
+    /**
+     * The offset of the second header for chromatic effect
+     */
     private static final int offset = 4;
+    /**
+     * Front- and back-versions of the header
+     */
     private BufferedImage front, back;
+    /**
+     * The bits of the header that merge into one
+     */
     private LinkedList<LinkedList<Pair<BufferedImage, Short>>> bits;
+    /**
+     * The flares that float to the top for nothing but effect
+     */
     private LinkedList<Triple<Rectangle, Color, Short>> flares;
+    /**
+     * The incrementing tick of the animation
+     */
     private short t = 0;
 
+    /**
+     * Creates a new header
+     * 
+     * @param header the title of the header
+     * @param font   the {@link java.awt.Font} of the header
+     * @param front  the color of the front image
+     * @param back   the color of the back image
+     */
     public Header(String header, Font font, Color front, Color back) {
+        super(new Dimension(new Canvas().getFontMetrics(font).stringWidth(Window.TITLE) + offset,
+        new Canvas().getFontMetrics(font).getHeight() + new Canvas().getFontMetrics(font).getDescent() + offset));
         // Titles
         FontMetrics fm = new Canvas().getFontMetrics(font);
         final Consumer<Boolean> render = (fslashb) -> {
@@ -82,11 +114,13 @@ public class Header {
         }
     }
 
+    @Override
     public BufferedImage render() {
-        return simRender(0.0);
+        return render(0.0);
     }
 
-    public BufferedImage simRender(double delta) {
+    @Override
+    public BufferedImage render(double delta) {
         BufferedImage img;
         if (t == -1) {
             // Draw normal title
@@ -132,6 +166,7 @@ public class Header {
         return img;
     }
 
+    @Override
     public void tick() {
         if (t >= 0 && t < 120) {
             t++;

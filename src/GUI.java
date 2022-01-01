@@ -7,6 +7,9 @@ import java.awt.event.MouseWheelEvent;
 
 /**
  * A graphics user interface that can be ticked and rendered by the engine
+ * 
+ * @author TheCommandBlock
+ * @since 12/12/2021
  */
 public abstract class GUI {
 
@@ -24,7 +27,7 @@ public abstract class GUI {
      * @param g the graphics object of the engine's canvas
      * @param d the delta time can be anything between 0 and 1
      */
-    protected void simRender(Graphics g, double d) {
+    protected void render(Graphics g, double d) {
     }
 
     /**

@@ -23,10 +23,16 @@ import java.awt.image.BufferedImage;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyEvent;
 import src.Window;
+import src.gpc.Header;
 import src.Engine;
 import src.GUI;
-import src.obj.Header;
 
+/**
+ * A new title screen for the game with fancy animation and buttons to all the other slides.
+ * 
+ * @author TheCommandBlock
+ * @since 15/12/2021
+ */
 public class Title extends GUI implements Start {
 
     /**
@@ -46,28 +52,70 @@ public class Title extends GUI implements Start {
      */
     static final String path = System.getProperty("user.dir");
 
+    /**
+     * A record of final attributes representing a button on the screen
+     */
     static record Button(String title, Image icon) {
 
+        /**
+         * Constant values for calculating the rendering of the button
+         */
         public static final int square = 60, space = square / 5, rectangle = 4 * square,
                 total = square + space + rectangle;
 
+        /**
+         * A new button with only a title. Since icon buttons should still have a title, 
+         * there is no constructor for only an icon.
+         * 
+         * @param title a string that will be rendered onto the button
+         */
         public Button(String title) {
             this(title, null);
         }
 
+        /**
+         * A new button with an icon and optionally a title.
+         * 
+         * @param title a title that could be shown as hover action
+         * @param icon  an image that will be rendered onto the button
+         */
+        public Button(String title, Image icon) {
+            this.title = title;
+            this.icon = icon;
+        }
+
+        /**
+         * Gets the title of the button
+         * 
+         * @return the title string
+         */
         public String getTitle() {
             return title;
         }
 
+        /**
+         * Gets the icon of the button
+         * 
+         * @return an {@link java.awt.Image} icon
+         */
         public Image getIcon() {
             return icon;
         }
 
+        /**
+         * Renders the button according to all its attributes either with an icon or a title.
+         * 
+         * @param size  the dimensions of the button
+         * @param color the {@link java.awt.Paint} with which to draw the background
+         * @return a rendered {@link java.awt.image.BufferedImage} of the button
+         */
         public BufferedImage renderButton(Dimension size, Paint color) {
             BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = (Graphics2D) img.getGraphics();
+            // Draw the background
             g.setPaint(color);
             g.fillRect(0, 0, size.width, size.height);
+            // Remove portions in the upper left and lower right corners
             final int carve = Button.square / 12;
             final Composite neutral = g.getComposite();
             g.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
@@ -84,6 +132,7 @@ public class Title extends GUI implements Start {
                 ys[i] = size.height - ys[i];
             }
             g.fillPolygon(new Polygon(xs, ys, cs.length));
+            // Draw the icon or the title onto the button
             g.setComposite(neutral);
             if (icon != null)
                 g.drawImage(icon, (size.width - carve * 6) / 2, carve * 3, Button.square - carve * 6,
@@ -128,6 +177,11 @@ public class Title extends GUI implements Start {
         this(new Background());
     }
 
+    /**
+     * Creates a new title screen with buttons and header plus fancy build-up animation
+     * 
+     * @param wallpaper
+     */
     public Title(Background wallpaper) {
         try {
             // Wallpaper
@@ -179,13 +233,15 @@ public class Title extends GUI implements Start {
         }
     }
 
+    @Override
     public void render(Graphics g) {
-        simRender(g, 0.0);
+        render(g, 0.0);
     }
 
-    public void simRender(Graphics g, double d) {
+    @Override
+    public void render(Graphics g, double d) {
         // Wallpaper
-        this.wallpaper.simRender(g, d);
+        this.wallpaper.render(g, d);
         
         // Title
         final BufferedImage titlerender = header.render();
@@ -227,14 +283,17 @@ public class Title extends GUI implements Start {
         g2d.setComposite(neutral);
     }
 
+    @Override
     public void tick() {
         // Satellite wallpaper
         this.wallpaper.tick();
 
         // Fade-in animation
         header.tick();
-        if (fadein < 30 * (buttons.size()+1))
+        if (fadein < 30 * (buttons.size()+1)) {
             fadein++;
+            return;
+        }
 
         // Hover action
         Point mouse = Engine.getMousePoint();
@@ -265,6 +324,7 @@ public class Title extends GUI implements Start {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         for (String title : actionfields.keySet()) {
             Rectangle field = actionfields.get(title);
@@ -290,6 +350,7 @@ public class Title extends GUI implements Start {
         }
     }
 
+    @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_F5) {
             // Actually only for maintenance and development purposes
@@ -305,11 +366,6 @@ public class Title extends GUI implements Start {
         }
     }
 
-    /**
-     * Returns the wallpaper of the title screen with all its satellite objects
-     * 
-     * @return the Background object
-     */
     public Background getWallpaper() {
         return this.wallpaper;
     }
