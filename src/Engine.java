@@ -196,35 +196,35 @@ public class Engine extends Canvas implements Runnable {
      * @param state a constant from the local UI.State enum that represents the game
      *              state
      */
-    public void setState(UI.State state) {
+    public static void setState(UI.State state) {
         switch (state) {
             case TITLE:
-                if (this.state.getState() != UI.State.NONE && this.state.getUI() instanceof Start)
-                    this.state.setState(new Title(((Start) this.state.getUI()).getWallpaper()), state);
+                if (game.state.getState() != UI.State.NONE && game.state.getUI() instanceof Start)
+                    game.state.setState(new Title(((Start) game.state.getUI()).getWallpaper()), state);
                 else
-                    this.state.setState(new Title(), state);
+                    game.state.setState(new Title(), state);
                 break;
             case EXPLORER:
-                this.state.setState(new Explorer(((Start) this.state.getUI()).getWallpaper()), state);
+                game.state.setState(new Explorer(((Start) game.state.getUI()).getWallpaper()), state);
                 break;
             case LOBBY:
                 // TODO the whole client/server architecture and everything
-                this.state.setState(new Lobby(((Start) this.state.getUI()).getWallpaper(), null), state);
+                game.state.setState(new Lobby(((Start) game.state.getUI()).getWallpaper(), null), state);
                 break;
             case TUTORIAL:
-                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.TUTORIAL), state);
+                game.state.setState(new Info(((Start) game.state.getUI()).getWallpaper(), Info.Tab.TUTORIAL), state);
                 break;
             case CREDITS:
-                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.CREDITS), state);
+                game.state.setState(new Info(((Start) game.state.getUI()).getWallpaper(), Info.Tab.CREDITS), state);
                 break;
             case SETTINGS:
-                this.state.setState(new Info(((Start) this.state.getUI()).getWallpaper(), Info.Tab.SETTINGS), state);
+                game.state.setState(new Info(((Start) game.state.getUI()).getWallpaper(), Info.Tab.SETTINGS), state);
                 break;
             case GAME:
-                this.state.setState(new Handler(), state);
+                game.state.setState(new Handler(), state);
                 break;
             default:
-                this.state.setState(null, UI.State.NONE);
+                game.state.setState(null, UI.State.NONE);
                 break;
         }
     }
@@ -234,8 +234,8 @@ public class Engine extends Canvas implements Runnable {
      * 
      * @return a constant from the local UI.State enum
      */
-    public UI.State getState() {
-        return state.getState();
+    public static UI.State getState() {
+        return game.state.getState();
     }
 
     /**

@@ -164,7 +164,7 @@ public class Info extends GUI implements Start {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
-            Engine.getEngine().setState(Engine.UI.State.TITLE);
+            Engine.setState(Engine.UI.State.TITLE);
         if (e.getKeyCode() == KeyEvent.VK_DOWN && info == Tab.TUTORIAL)
             md.scroll(2);
         else if (e.getKeyCode() == KeyEvent.VK_UP && info == Tab.TUTORIAL)

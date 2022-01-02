@@ -297,6 +297,7 @@ public class Title extends GUI implements Start {
 
         // Hover action
         Point mouse = Engine.getMousePoint();
+        if (mouse == null) return;
         for (int i = 0; i < buttons.size(); i++) {
             if (hoverflow[i] > 0)
                 hoverflow[i]--;
@@ -335,16 +336,16 @@ public class Title extends GUI implements Start {
             switch (title) {
                 case "Open Lobby":
                 case "Join Lobby":
-                    Engine.getEngine().setState(Engine.UI.State.EXPLORER);
+                    Engine.setState(Engine.UI.State.EXPLORER);
                     break;
                 case Window.TITLE + " in a nutshell":
-                    Engine.getEngine().setState(Engine.UI.State.TUTORIAL);
+                    Engine.setState(Engine.UI.State.TUTORIAL);
                     break;
                 case "Settings":
-                    Engine.getEngine().setState(Engine.UI.State.SETTINGS);
+                    Engine.setState(Engine.UI.State.SETTINGS);
                     break;
                 case "Credits":
-                    Engine.getEngine().setState(Engine.UI.State.CREDITS);
+                    Engine.setState(Engine.UI.State.CREDITS);
                     break;
             }
         }

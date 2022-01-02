@@ -60,7 +60,7 @@ public class Explorer extends GUI implements Start {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
-            Engine.getEngine().setState(Engine.UI.State.TITLE);
+            Engine.setState(Engine.UI.State.TITLE);
     }
     
 }
