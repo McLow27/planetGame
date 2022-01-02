@@ -111,7 +111,7 @@ public class Info extends GUI implements Start {
         this.md = null;
         this.load = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN,
         new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f),
-        (int) (2.5 * 60));
+        (int) (2.5 * 20));
         Thread secondary = new Thread() {
             public void run() {
                 try {

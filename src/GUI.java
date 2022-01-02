@@ -137,7 +137,7 @@ public abstract class GUI {
 	 *           width/height)
 	 * @return the current y of the function f(x)
 	 */
-	public static int smoothCurve(int x, double dx, double dy) {
+	public static int smoothCurve(double x, double dx, double dy) {
 		double d = java.lang.Math.sin((x / (dx / 3)) + 4.75) + 1.0;
 		return (int) (d * dy / 2);
 	}

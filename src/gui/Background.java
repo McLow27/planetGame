@@ -47,7 +47,7 @@ public class Background extends GUI {
          * Creates a new satellite object and randomly sets all the attributes
          */
         public Satellite() {
-            this.velX = (random.nextInt(50) + 10) / 12.0;
+            this.velX = (random.nextInt(50) + 10) / 4.0;
             this.sat = random.nextInt(sats.length);
             final int width = sats[this.sat].getWidth(), height = sats[this.sat].getHeight();
             final int max = 140, min = 30;

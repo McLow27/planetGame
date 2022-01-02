@@ -126,7 +126,7 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         // Show the title screen
         state = new UI();
-        setState(UI.State.TITLE);
+        state.setState(new Title(), UI.State.TITLE);
         // Create a new window with this canvas and add listeners
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
@@ -161,7 +161,7 @@ public class Engine extends Canvas implements Runnable {
      */
     public void run() {
         long lastTime = System.nanoTime();
-        double tps = 60.0;
+        double tps = 20.0;
         double ns = 1000000000 / tps;
         double delta = 0;
         long timer = System.currentTimeMillis();

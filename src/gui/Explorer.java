@@ -27,7 +27,7 @@ public class Explorer extends GUI implements Start {
         try {
             this.panel = new LoadingBar(new Dimension(600, 60), Font.createFont(Font.PLAIN,
             new File(System.getProperty("user.dir") + "\\rsc\\fonts\\NexaHeavy.ttf")).deriveFont(24f),
-            60 * 8, "Gathering lobbies...");
+            20 * 8, "Gathering lobbies...");
             ((LoadingBar) this.panel).finish();
         } catch (Exception e) {
             e.printStackTrace();

@@ -75,7 +75,7 @@ public class Header extends Panel {
         render.accept(true);
         render.accept(false);
         // Header bits for animation
-        final int width = 12, maxstart = 60;
+        final int width = 12, maxstart = 20;
         Random random = new Random();
         this.bits = new LinkedList<LinkedList<Pair<BufferedImage, Short>>>();
         for (int ln = 0; ln < this.front.getWidth(); ln += width) {
@@ -141,7 +141,7 @@ public class Header extends Panel {
                     Pair<BufferedImage, Short> tuple = bits.get(x).get(y - 1);
                     cy -= tuple.getAlpha().getHeight() - 12 - offset;
                     if (tuple.getBeta() >= 0)
-                        g.drawImage(tuple.getAlpha(), cx, cy - GUI.smoothCurve(tuple.getBeta()+60, 120, front.getHeight()), null);
+                        g.drawImage(tuple.getAlpha(), cx, cy - GUI.smoothCurve(tuple.getBeta()+delta+20, 40, front.getHeight()), null);
                 }
                 cx += 12;
             }
@@ -150,15 +150,15 @@ public class Header extends Panel {
                 Triple<Rectangle, Color, Short> triple = flares.get(i);
                 if (triple.getGamma() < 0)
                     continue;
-                Composite neutral = g.getComposite();
-                if (triple.getGamma() < 15)
-                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, triple.getGamma() / 15f));
-                else if (triple.getGamma() > 75 && triple.getGamma() < 90)
-                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (triple.getGamma() - 75) / 15f));
-                else if (triple.getGamma() >= 90)
+                final Composite neutral = g.getComposite();
+                if (triple.getGamma() < 5)
+                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) (triple.getGamma() + delta) / 5f));
+                else if (triple.getGamma() > 25 && triple.getGamma() < 30)
+                    g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) (triple.getGamma() - 25 + delta) / 5f));
+                else if (triple.getGamma() >= 30)
                     continue;
                 g.setColor(triple.getBeta());
-                g.fill(triple.getAlpha());
+                g.fillRect(triple.getAlpha().x, triple.getAlpha().y - (int) (delta * 6), triple.getAlpha().width, triple.getAlpha().height);
                 g.setComposite(neutral);
             }
             g.dispose();
@@ -168,23 +168,23 @@ public class Header extends Panel {
 
     @Override
     public void tick() {
-        if (t >= 0 && t < 120) {
+        if (t >= 0 && t < 40) {
             t++;
             for (int x = 0; x < bits.size(); x++) {
                 for (int y = 0; y < bits.get(x).size(); y++) {
-                    if (bits.get(x).get(y).getBeta() < 60)
+                    if (bits.get(x).get(y).getBeta() < 20)
                         bits.get(x).get(y).setBeta((short) (bits.get(x).get(y).getBeta() + 1));
                 }
             }
             for (int i = 0; i < flares.size(); i++) {
-                if (flares.get(i).getGamma() <= 90) {
+                if (flares.get(i).getGamma() <= 30) {
                     flares.get(i).setGamma((short)(flares.get(i).getGamma()+1));
                     Rectangle rect = flares.get(i).getAlpha();
-                    rect.y -= 2;
+                    rect.y -= 6;
                     flares.get(i).setAlpha(rect);
                 }
             }
-        } else if (t >= 120)
+        } else if (t >= 40)
             t = -1;
     }
 }

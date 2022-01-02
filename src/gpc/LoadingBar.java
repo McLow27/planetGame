@@ -151,17 +151,16 @@ public class LoadingBar extends Panel {
             g.fillRect(6, 6+banner, bar.width-13, bar.height-13);
         }
         // Draw the bar itself
-        int p = (bar.width-9) * (inc % dur) / dur;
-        double rate = (bar.width-9) / (double) dur;
+        int p = (int) ((bar.width-9) * ((inc + d) % dur) / dur);
         if (p > 4) {
             g.setColor(color3);
-            g.fillRect(6, 6+banner, (int) (p-4 + rate*d), bar.height-13);
+            g.fillRect(6, 6+banner, p-4, bar.height-13);
         }
         int w = 4;
         if (p < 4) w = p;
         else if (p > bar.width+4) w = p - (bar.width + 4);
         g.setColor(Color.WHITE);
-        g.fillRect((int) (p + rate*d), 6+banner, w, bar.height-13);
+        g.fillRect(p, 6+banner, w, bar.height-13);
         return img;
     }
 

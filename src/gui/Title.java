@@ -244,7 +244,7 @@ public class Title extends GUI implements Start {
         this.wallpaper.render(g, d);
         
         // Title
-        final BufferedImage titlerender = header.render();
+        final BufferedImage titlerender = header.render(d);
         g.drawImage(titlerender, (Window.WIDTH - titlerender.getWidth()) / 2, 40, null);
 
         // UI Buttons
@@ -252,17 +252,19 @@ public class Title extends GUI implements Start {
         final Composite neutral = g2d.getComposite();
         final Color color1 = new Color(238, 0, 253), color2 = new Color(134, 0, 105);
         for (int i = 0; i < buttons.size(); i++) {
-            final double ticks = 30.0;
+            final double ticks = 10.0;
             if (i * ticks / 2 > fadein)
                 continue;
             double fade = 1.0;
-            if(fadein < (i + 2) * ticks / 2)
-                fade = smoothCurve((int) (fadein - i * ticks / 2), ticks, 100) / 100.0;
+            if (fadein < (i + 2) * ticks / 2)
+                fade = smoothCurve(fadein + d - i * ticks / 2, ticks, 100) / 100.0;
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) fade));
             Rectangle field = actionfields.get(buttons.get(i).getTitle());
-            if (hoverflow[i] > 0 && fade >= 1.0) {
+            if (hoverflow[i] != 0 && fade >= 1.0) {
                 GradientPaint paint;
-                final int shift = (int)(hoverflow[i] / 30.0 * field.width);
+                int shift = (int) ((Math.abs(hoverflow[i]) + (hoverflow[i] < 0 ? 1-d : +d)) / 10.0 * field.width);
+                if (shift > field.width)
+                    shift = field.width;
                 if (i % 2 == 0) {
                     paint = new GradientPaint(shift, field.height / 2, color1, field.width + shift, field.height / 2, color2, false);
                     g.drawImage(buttons.get(i).renderButton(new Dimension(field.width, field.height), paint), field.x, field.y, null);
@@ -290,7 +292,7 @@ public class Title extends GUI implements Start {
 
         // Fade-in animation
         header.tick();
-        if (fadein < 30 * (buttons.size()+1)) {
+        if (fadein < 10 * buttons.size()) {
             fadein++;
             return;
         }
@@ -300,7 +302,9 @@ public class Title extends GUI implements Start {
         if (mouse == null) return;
         for (int i = 0; i < buttons.size(); i++) {
             if (hoverflow[i] > 0)
-                hoverflow[i]--;
+                hoverflow[i] = (short) -hoverflow[i];
+            if (hoverflow[i] < 0)
+                hoverflow[i]++;
         }
         for (String title : actionfields.keySet()) {
             Rectangle field = actionfields.get(title);
@@ -317,10 +321,10 @@ public class Title extends GUI implements Start {
             }
             if (index == -1)
                 break;
-            if (hoverflow[index] < 30)
-                hoverflow[index] += 2;
-            if (hoverflow[index] > 30)
-                hoverflow[index] = 30;
+            if (Math.abs(hoverflow[index]) < 10)
+                hoverflow[index] = (short) -(hoverflow[index] - 2);
+            if (hoverflow[index] > 10)
+                hoverflow[index] = 10;
             break;
         }
     }
