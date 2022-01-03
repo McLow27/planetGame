@@ -170,13 +170,14 @@ public class Engine extends Canvas implements Runnable {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
+            boolean whole = delta >= 1;
             // Tick at the constant TPS as specified above
             while (delta >= 1) {
                 tick();
                 delta--;
             }
             // Render at the maximum FPS
-            if (running && delta >= 1)
+            if (running && whole)
                 render();
             else if (running)
                 render(delta);

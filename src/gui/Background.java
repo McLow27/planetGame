@@ -166,7 +166,7 @@ public class Background extends GUI {
     @Override
     public void tick() {
         // Satellites
-        if (random.nextInt(60) < 1)
+        if (random.nextInt(20) < 1)
             satellites.add(new Satellite());
         for (int i = 0; i < satellites.size(); i++) {
             Satellite sat = satellites.get(i);
@@ -197,8 +197,7 @@ public class Background extends GUI {
         // Satellites
         for (Satellite sat : satellites) {
             g.drawImage(sats[sat.getSatellite()], (int) (sat.getX() + sat.getXVelocity() * d),
-                    (int) sat.getY(),
-                    (int) sat.getDimension().getWidth(),
+                    (int) sat.getY(), (int) sat.getDimension().getWidth(),
                     (int) sat.getDimension().getHeight(), null);
         }
     }
