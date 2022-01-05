@@ -2,8 +2,13 @@ package src.gui;
 
 import java.util.LinkedList;
 import java.awt.Graphics;
+import java.awt.Dimension;
+import java.awt.event.MouseWheelEvent;
 import src.GUI;
+import src.Window;
 import src.obj.Entity;
+import src.srv.ServerInterface;
+import src.gpc.Map;
 
 /**
  * A class for handling all the objects of the game.
@@ -16,7 +21,15 @@ import src.obj.Entity;
  * @since 03/12/2021
  */
 public class Handler extends GUI {
-    LinkedList<Entity> objects = new LinkedList<Entity>();
+    private ServerInterface client;
+    private LinkedList<Entity> objects;
+    private Map map;
+
+    public Handler(ServerInterface client) {
+        this.client = client;
+        this.objects = new LinkedList<Entity>();
+        this.map = new Map(new Dimension(Window.WIDTH, Window.HEIGHT), Map.Celestial.assign(client.getMap()));
+    }
 
     @Override
     public void tick() {
@@ -26,6 +39,13 @@ public class Handler extends GUI {
 
     @Override
     public void render(Graphics g) {
+        render(g, 0.0);
+    }
+
+    @Override
+    public void render(Graphics g, double d) {
+        g.drawImage(map.render(), 0, 0, null);
+
         for (Entity object : objects) {
             object.render(g);
         }
@@ -47,5 +67,13 @@ public class Handler extends GUI {
      */
     public void removeObject(Entity object) {
         objects.remove(object);
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (e.getWheelRotation() > 0)
+            map.zoomOut();
+        else if (e.getWheelRotation() < 0)
+            map.zoomIn();
     }
 }

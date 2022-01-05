@@ -28,7 +28,6 @@ public class Markdown extends Panel {
     /**
      * Whether there should be a fade animation when scrolling
      */
-    // TODO maybe add this
     private boolean fadein = true;
     /**
      * An unsigned integer defining how far one has scrolled

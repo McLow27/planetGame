@@ -13,6 +13,7 @@ import src.gui.Info;
 import src.gui.Lobby;
 import src.gui.Start;
 import src.gui.Title;
+import src.srv.Test;
 
 /**
  * A game engine extending the {@link java.awt.Canvas} class; runs a tick/render engine in a
@@ -126,7 +127,7 @@ public class Engine extends Canvas implements Runnable {
     public Engine() {
         // Show the title screen
         state = new UI();
-        state.setState(new Title(), UI.State.TITLE);
+        state.setState(new Handler(new Test()), UI.State.GAME);
         // Create a new window with this canvas and add listeners
         new Window(WIDTH, HEIGHT, TITLE, this);
         this.addKeyListener(new KeyInput(state));
@@ -222,7 +223,7 @@ public class Engine extends Canvas implements Runnable {
                 game.state.setState(new Info(((Start) game.state.getUI()).getWallpaper(), Info.Tab.SETTINGS), state);
                 break;
             case GAME:
-                game.state.setState(new Handler(), state);
+                game.state.setState(new Handler(new Test()), state);
                 break;
             default:
                 game.state.setState(null, UI.State.NONE);
