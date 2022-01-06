@@ -3,6 +3,7 @@ package src.gui;
 import java.util.LinkedList;
 import java.awt.Graphics;
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseWheelEvent;
 import src.GUI;
 import src.Window;
@@ -75,5 +76,27 @@ public class Handler extends GUI {
             map.zoomOut();
         else if (e.getWheelRotation() < 0)
             map.zoomIn();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SHIFT:
+                if (map.getZoom() == 0.2) map.setZoom(2.5);
+                else map.setZoom(0.2);
+                break;
+            case KeyEvent.VK_LEFT:
+                map.move(-4, 0);
+                break;
+            case KeyEvent.VK_RIGHT:
+                map.move(4, 0);
+                break;
+            case KeyEvent.VK_UP:
+                map.move(0, -4);
+                break;
+            case KeyEvent.VK_DOWN:
+                map.move(0, 4);
+                break;
+        }
     }
 }

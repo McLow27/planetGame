@@ -170,38 +170,62 @@ public class Map extends Panel {
     public BufferedImage render() {
         BufferedImage img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
-        int w = (int) (128 * zoom), h = (int) (64 * zoom);
+        int w = (int) (128 * zoom), h = (int) ((64+16) * zoom);
+        
         boolean eo = false;
-        for (int y = 0; y < Window.HEIGHT; y += h) {
-            eo = y / h % 2 == 0;
-            for (int x = -w / 2 * (int) ((y / h + 1) / 2 % 3 + 2); x < Window.WIDTH; x += w / 2) {
+        for (int y = (int) (-coordinates.y * zoom); y < Window.HEIGHT; y += h) {
+            if ((y + (int) (coordinates.x * zoom)) / h % 2 == 0) g.setColor(Color.RED);
+            else g.setColor(Color.BLUE);
+            eo = true;
+            for (int x = -w * 2 + ((y+(int)(coordinates.y*zoom))/(h)%9*w/6) - (int) (coordinates.x * zoom); x < Window.WIDTH; x += 2*w/3) {
                 eo = !eo;
                 if (eo)
                     y -= h/2;
-                int[] xs = {x, x+w/2, x+w, x+w, x+w/2, x},
-                      ys = {y, y, y+h/2, y+h, y+h, y+h/2};
+                int[] xs = {x, w/6+x, 2*w/3+x, w+x, 5*w/6+x, w/3+x},
+                      ys = {h/2+y, y, y, h/2+y, h+y, h+y};
                 if (eo) {
                     y += h/2;
-                    x += w/2;
+                    x += w/6;
                 }
                 Polygon poly = new Polygon(xs, ys, 6);
-                g.setColor(new Color(190, 209, 100));
-                g.fill(poly);
-                g.setColor(new Color(192, 228, 18));
                 g.draw(poly);
             }
         }
+        
         return img;
     }
 
     public void zoomIn() {
-        if (zoom < 1.0)
+        if (zoom < 2.5)
             zoom += 0.1;
     }
 
     public void zoomOut() {
         if (zoom > 0.2)
             zoom -= 0.1;
+    }
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double zoom) {
+        if (zoom >= 0.2 && zoom <= 2.5)
+            this.zoom = zoom;
+    }
+
+    public void move(Dimension d) {
+        this.coordinates.x += d.getWidth();
+        this.coordinates.y += d.getHeight();
+    }
+
+    public void move(int x, int y) {
+        this.coordinates.x += x;
+        this.coordinates.y += y;
+    }
+
+    public Point getPosition() {
+        return coordinates;
     }
 
 }
